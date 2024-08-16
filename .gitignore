@@ -1,0 +1,55 @@
+# Archivos de compilación y directorios
+bin/
+obj/
+out/
+
+# Paquetes de NuGet descargados
+packages/
+*.nupkg
+*.snupkg
+
+# Archivos de configuración de VS y Rider
+.vscode/
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Archivos generados por el sistema
+*.DS_Store
+*.lock
+*.log
+*.bak
+*.swp
+*.tmp
+*.tmp/
+
+# Archivos de distribución
+*.pdb
+*.dll
+*.exe
+*.app
+*.so
+*.dylib
+
+# Archivos de configuraciones de usuario
+*.dbmdl
+*.jfm
+*.class
+*.userprefs
+
+# Archivos relacionados con la ejecución y depuración
+*.log
+*.tlog
+*.vscode/*
+*.vs/
+.vscode/
+*.suo
+
+# Configuración del entorno
+.env
+
+# Archivos de publicación
+publish/
