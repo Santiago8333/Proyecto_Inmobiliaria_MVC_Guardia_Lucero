@@ -1,55 +1,43 @@
-# Archivos de compilación y directorios
-bin/
-obj/
-out/
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
 
-# Paquetes de NuGet descargados
-packages/
-*.nupkg
-*.snupkg
-
-# Archivos de configuración de VS y Rider
+# Visual Studio Code
 .vscode/
-.vs/
+
+# Rider
 .idea/
+
+# Visual Studio
+.vs/
+
+# Fleet
+.fleet/
+
+# Code Rush
+.cr/
+
+# User-specific files
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 
-# Archivos generados por el sistema
-*.DS_Store
-*.lock
-*.log
-*.bak
-*.swp
-*.tmp
-*.tmp/
-
-# Archivos de distribución
-*.pdb
-*.dll
-*.exe
-*.app
-*.so
-*.dylib
-
-# Archivos de configuraciones de usuario
-*.dbmdl
-*.jfm
-*.class
-*.userprefs
-
-# Archivos relacionados con la ejecución y depuración
-*.log
-*.tlog
-*.vscode/*
-*.vs/
-.vscode/
-*.suo
-
-# Configuración del entorno
-.env
-
-# Archivos de publicación
-publish/
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn

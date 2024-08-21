@@ -1,0 +1,111 @@
+@model IEnumerable<Proyecto_Inmobiliaria_MVC.Models.Propietario>
+@{
+    ViewData["Title"] = "Propietarios";
+}
+
+<div class="text-center">
+	<h1 class="display-4">Lista de Propietarios</h1>
+</div>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+        <th>Id</th>
+        <th>Dni</th>
+        <th>Apellido</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+        @foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Id_propietarios)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Dni)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Apellido)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Nombre)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Email)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Telefono)
+				</td>
+                <td>
+                    <a href="/modificar" style="margin-right: 10px;"><i class="fa-solid fa-pencil"></i></a>
+                    <a href="/detalle" style="margin-right: 10px;"><i class="fa-solid fa-book"></i></a>
+                    <a href="/eliminar"><i class="fa-solid fa-trash"></i></a>
+				</td>
+			</tr>
+		}
+  </tbody>
+</table>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Propietarios</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formAgregarPropietario">
+            <div class="mb-3">
+            <label for="exampleInputDni" class="form-label">Dni</label>
+            <input type="text" class="form-control" id="exampleInputDni" aria-describedby="dniHelp">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <button type="submit" class="btn btn-primary" >Agregar</button>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Paginación -->
+@if (ViewBag.TotalPropietarios > 10)
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+            <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
+            <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="?page=2" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
+
