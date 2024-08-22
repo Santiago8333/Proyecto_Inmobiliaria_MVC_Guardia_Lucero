@@ -1,0 +1,31 @@
+@model Proyecto_Inmobiliaria_MVC.Models.Propietario
+@{
+    ViewData["Title"] = "Propietarios Edicion";
+}
+<h1>Editar Propietario</h1>
+
+<form asp-action="Actualizar" method="post">
+    <div class="mb-3">
+        <label for="Dni" class="form-label">DNI</label>
+        <input type="text" class="form-control" id="Dni" name="Dni" value="@Model.Dni" />
+        <input type="hidden" class="form-control" id="Id_propietarios" name="Id_propietarios" value="@Model.Id_propietarios" />
+    </div>
+    <div class="mb-3">
+        <label for="Apellido" class="form-label">Apellido</label>
+        <input type="text" class="form-control" id="Apellido" name="Apellido" value="@Model.Apellido" />
+    </div>
+    <div class="mb-3">
+        <label for="Nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="Nombre" name="Nombre" value="@Model.Nombre" />
+    </div>
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" />
+    </div>
+    <div class="mb-3">
+        <label for="Telefono" class="form-label">Teléfono</label>
+        <input type="text" class="form-control" id="Telefono" name="Telefono" value="@Model.Telefono" />
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+</form>
+ <a class="btn btn-info" asp-action="Index">Volver</a>

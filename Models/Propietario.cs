@@ -13,4 +13,6 @@ public class Propietario
 
     public int Telefono {get;set;}
 
+    public bool Estado {get;set;} = false;
+
 }

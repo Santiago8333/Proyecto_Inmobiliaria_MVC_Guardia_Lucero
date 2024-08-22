@@ -12,7 +12,7 @@ public class RepositorioPropietario
 		using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
 			var query = $@"SELECT {nameof(Propietario.Id_propietarios)}, {nameof(Propietario.Dni)}, {nameof(Propietario.Apellido)}, {nameof(Propietario.Nombre)}, {nameof(Propietario.Email)}, {nameof(Propietario.Telefono)} 
-                      FROM propietarios";
+                      FROM propietarios WHERE Estado = true";
 			using(MySqlCommand command = new MySqlCommand(query, connection))
 			{
 				connection.Open();
@@ -39,8 +39,8 @@ public class RepositorioPropietario
 	
     using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"INSERT INTO propietarios ({nameof(Propietario.Dni)}, {nameof(Propietario.Apellido)}, {nameof(Propietario.Nombre)}, {nameof(Propietario.Email)}, {nameof(Propietario.Telefono)})
-                    VALUES (@Dni, @Apellido, @Nombre,@Email,@Telefono)";
+        var query = $@"INSERT INTO propietarios ({nameof(Propietario.Dni)}, {nameof(Propietario.Apellido)}, {nameof(Propietario.Nombre)}, {nameof(Propietario.Email)}, {nameof(Propietario.Telefono)}, {nameof(Propietario.Estado)})
+                    VALUES (@Dni, @Apellido, @Nombre,@Email,@Telefono, @Estado)";
                        
         using(MySqlCommand command = new MySqlCommand(query, connection))
         {
@@ -50,6 +50,7 @@ public class RepositorioPropietario
             command.Parameters.AddWithValue("@Nombre", nuevoPropietario.Nombre);
             command.Parameters.AddWithValue("@Email", nuevoPropietario.Email);
 			command.Parameters.AddWithValue("@Telefono", nuevoPropietario.Telefono);
+            command.Parameters.AddWithValue("@Estado", true); 
 
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
@@ -61,14 +62,86 @@ public class RepositorioPropietario
 {
 using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-		var query = "DELETE FROM propietarios WHERE Id_propietarios = @Id";
+		//var query = "DELETE FROM propietarios WHERE Id_propietarios = @Id";
+        var query = $@"UPDATE propietarios 
+                       SET {nameof(Propietario.Estado)} = @Estado
+                       WHERE Id_propietarios = @Id";
+
  		using(MySqlCommand command = new MySqlCommand(query, connection))
         {
-			 command.Parameters.AddWithValue("@Id", id);
+            command.Parameters.AddWithValue("@Estado", false); 
+			command.Parameters.AddWithValue("@Id", id);
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
             connection.Close();
         }
 	}
+}
+
+public Propietario? Obtener(int id)
+{
+    Propietario? res = null;
+
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_propietarios, Dni, Apellido, Nombre, Email, Telefono 
+                      FROM propietarios 
+                      WHERE Id_propietarios = @Id AND Estado = true";
+
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+
+            connection.Open();
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Propietario
+                    {
+                        Id_propietarios = reader.GetInt32("Id_propietarios"),
+                        Dni = reader.GetString("Dni"),
+                        Apellido = reader.GetString("Apellido"),
+                        Nombre = reader.GetString("Nombre"),
+                        Email = reader.GetString("Email"),
+                        Telefono = reader.GetInt32("Telefono")
+                    };
+                }
+            }
+        }
+    }
+
+    return res; // Retorna el propietario o null si no se encontró
+}
+public void ActualizarPropietario(Propietario actualizarPropietario)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE propietarios 
+               SET 
+                   {nameof(Propietario.Dni)} = @Dni, 
+                   {nameof(Propietario.Apellido)} = @Apellido, 
+                   {nameof(Propietario.Nombre)} = @Nombre, 
+                   {nameof(Propietario.Email)} = @Email, 
+                   {nameof(Propietario.Telefono)} = @Telefono
+               WHERE Id_propietarios = @Id AND Estado = true";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega los parámetros
+			command.Parameters.AddWithValue("@Dni", actualizarPropietario.Dni);
+            command.Parameters.AddWithValue("@Apellido", actualizarPropietario.Apellido);
+            command.Parameters.AddWithValue("@Nombre", actualizarPropietario.Nombre);
+            command.Parameters.AddWithValue("@Email", actualizarPropietario.Email);
+			command.Parameters.AddWithValue("@Telefono", actualizarPropietario.Telefono);
+            command.Parameters.AddWithValue("@Id", actualizarPropietario.Id_propietarios);
+
+            connection.Open();
+            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            connection.Close();
+        }
+    }
+
 }
 }
