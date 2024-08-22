@@ -41,9 +41,12 @@
 					@Html.DisplayFor(modelItem => item.Telefono)
 				</td>
                 <td>
-                    <a href="/modificar" style="margin-right: 10px;"><i class="fa-solid fa-pencil"></i></a>
-                    <a href="/detalle" style="margin-right: 10px;"><i class="fa-solid fa-book"></i></a>
-                    <a href="/eliminar"><i class="fa-solid fa-trash"></i></a>
+                    <a href="@Url.Action("Editar", "Propietarios", new { id = item.Id_propietarios }) " class="btn btn-primary">
+                      <i class="fa-solid fa-pencil"></i>
+                  </a>
+                    <a href="@Url.Action("Eliminar", "Propietarios", new { id = item.Id_propietarios })" class="btn btn-danger">
+                      <i class="fa-solid fa-trash"></i>
+                  </a>
 				</td>
 			</tr>
 		}
@@ -63,19 +66,26 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="formAgregarPropietario">
+        <form asp-action="Agregar" method="post" id="formAgregarPropietario">
             <div class="mb-3">
             <label for="exampleInputDni" class="form-label">Dni</label>
-            <input type="text" class="form-control" id="exampleInputDni" aria-describedby="dniHelp">
+            <input type="text" class="form-control" id="exampleInputDni" name="Dni">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputApellido" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="exampleInputApellido"  name="Apellido">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputNombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="exampleInputNombre"  name="Nombre">
         </div>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Email</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            <input type="email" class="form-control" id="exampleInputEmail1" name="Email">
         </div>
         <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1">
+            <label for="exampleInputTelefono" class="form-label">Telefono</label>
+            <input type="number" class="form-control" id="exampleInputTelefono"  name="Telefono">
         </div>
         <button type="submit" class="btn btn-primary" >Agregar</button>
 
