@@ -96,3 +96,29 @@
     </div>
   </div>
 </div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Sistema</strong>
+      <small class="text-muted">justo ahora</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+    <div class="toast-body">
+      @TempData["Mensaje"]
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElement = document.getElementById("successToast");
+        var toast = new bootstrap.Toast(toastElement);
+        
+        @if (TempData["Mensaje"] != null)
+        {
+            <text>
+                toast.show();
+            </text>
+        }
+    });
+</script>
