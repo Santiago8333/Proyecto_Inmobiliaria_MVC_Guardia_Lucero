@@ -40,16 +40,14 @@ public IActionResult Agregar(Propietario nuevoPropietario)
 
 public IActionResult Eliminar(int id)
 {
-    try
-    {
+  var propietario = repo.ObtenerPorID(id);
+        if (propietario == null)
+        {
+            return RedirectToAction("Index");
+        }
         repo.EliminarPropietario(id);
         return RedirectToAction("Index");
-    }
-    catch (Exception ex)
-    {
-        
-        return View("Error", new { message = ex.Message });
-    }
+    
 }
 
 public IActionResult Edicion(int id)
@@ -60,7 +58,7 @@ public IActionResult Edicion(int id)
     }
     else
     {
-        var propietario = repo.Obtener(id);
+        var propietario = repo.ObtenerPorID(id);
         if (propietario == null)
         {
             return RedirectToAction("Index");

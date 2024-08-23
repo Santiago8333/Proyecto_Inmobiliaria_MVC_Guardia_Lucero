@@ -58,7 +58,7 @@ public class RepositorioPropietario
         }
     }
 }
-		public void EliminarPropietario(int id)
+public void EliminarPropietario(int id)
 {
 using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
@@ -72,13 +72,13 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Estado", false); 
 			command.Parameters.AddWithValue("@Id", id);
             connection.Open();
-            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            command.ExecuteNonQuery();
             connection.Close();
         }
 	}
 }
 
-public Propietario? Obtener(int id)
+public Propietario? ObtenerPorID(int id)
 {
     Propietario? res = null;
 
@@ -138,7 +138,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Id", actualizarPropietario.Id_propietarios);
 
             connection.Open();
-            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            command.ExecuteNonQuery(); 
             connection.Close();
         }
     }
