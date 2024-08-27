@@ -1,0 +1,32 @@
+@model Proyecto_Inmobiliaria_MVC.Models.Inquilinos
+@{
+    ViewData["Title"] = "Detalle Inquilino";
+}
+<h1>Detalle Inquilino</h1>
+<form >
+    <div class="mb-3">
+        <label for="Id_inquilinos" class="form-label">Id</label>
+        <input type="text" class="form-control" id="Id_inquilinos" name="Id_inquilinos" value="@Model.Id_inquilinos" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Dni" class="form-label">DNI</label>
+        <input type="text" class="form-control" id="Dni" name="Dni" value="@Model.Dni" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Apellido" class="form-label">Apellido</label>
+        <input type="text" class="form-control" id="Apellido" name="Apellido" value="@Model.Apellido" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="Nombre" name="Nombre" value="@Model.Nombre"readonly />
+    </div>
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Telefono" class="form-label">Teléfono</label>
+        <input type="text" class="form-control" id="Telefono" name="Telefono" value="@Model.Telefono" readonly/>
+    </div>
+</form>
+ <a class="btn btn-info" asp-action="Index">Volver</a>

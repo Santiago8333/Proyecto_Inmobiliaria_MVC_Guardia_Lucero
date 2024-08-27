@@ -64,6 +64,25 @@ public IActionResult Edicion(int id)
     }
 
 }
+public IActionResult Detalle(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Inquilino no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var inquilinos = repo.ObtenerPorID(id);
+        if (inquilinos == null)
+        {
+            TempData["Mensaje"] = "Inquilino no encontrado.";
+            return RedirectToAction("Index");
+        }
+        return View(inquilinos);
+    }
+
+}
 [HttpPost]
 public IActionResult Actualizar(Inquilinos actualizarInquilinos)
 {

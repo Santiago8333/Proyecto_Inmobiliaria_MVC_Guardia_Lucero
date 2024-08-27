@@ -71,6 +71,26 @@ public IActionResult Edicion(int id)
     }
 
 }
+public IActionResult Detalle(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Propietario no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var propietario = repo.ObtenerPorID(id);
+        if (propietario == null)
+        {
+            TempData["Mensaje"] = "Propietario no encontrado.";
+            return RedirectToAction("Index");
+        }
+        
+        return View(propietario);
+    }
+
+}
 [HttpPost]
 public IActionResult Actualizar(Propietario actualizarPropietario)
 {

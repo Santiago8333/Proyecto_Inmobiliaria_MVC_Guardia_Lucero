@@ -11,7 +11,7 @@ public class Propietario
 
     public string Email {get;set;} = "";
 
-    public int Telefono {get;set;}
+    public string Telefono {get;set;} = "";
 
     public bool Estado {get;set;} = false;
 

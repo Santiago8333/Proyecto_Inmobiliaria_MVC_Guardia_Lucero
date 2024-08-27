@@ -26,7 +26,7 @@ public class RepositorioPropietario
                     Apellido = reader.GetString(nameof(Propietario.Apellido)),
                     Nombre = reader.GetString(nameof(Propietario.Nombre)),
                     Email = reader.GetString(nameof(Propietario.Email)),
-                    Telefono = reader.GetInt32(nameof(Propietario.Telefono))
+                    Telefono = reader.GetString(nameof(Propietario.Telefono))
 					});
 				}
 				connection.Close();
@@ -106,7 +106,7 @@ public Propietario? ObtenerPorID(int id)
                         Apellido = reader.GetString("Apellido"),
                         Nombre = reader.GetString("Nombre"),
                         Email = reader.GetString("Email"),
-                        Telefono = reader.GetInt32("Telefono")
+                        Telefono = reader.GetString("Telefono")
                     };
                 }
             }

@@ -40,6 +40,9 @@
 					@Html.DisplayFor(modelItem => item.Telefono)
 				</td>
                 <td>
+                  <a href="@Url.Action("Detalle", "Inquilinos", new { id = item.Id_inquilinos }) " class="btn btn-info">
+                      <i class="fa-solid fa-info"></i>
+                  </a>
                     <a href="@Url.Action("Edicion", "Inquilinos", new { id = item.Id_inquilinos }) " class="btn btn-primary">
                       <i class="fa-solid fa-pencil"></i>
                   </a>
