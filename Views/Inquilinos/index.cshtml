@@ -1,4 +1,4 @@
-@model IEnumerable<Proyecto_Inmobiliaria_MVC.Models.Inquilinos>
+@model Paginacion<Inquilinos>
 @{
     ViewData["Title"] = "Inquilinos";
 }
@@ -58,7 +58,51 @@
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
   <i class="fa-solid fa-plus"></i>
 </button>
+<!-- Paginación -->
+<nav aria-label="Navegación de página">
+    <ul class="pagination justify-content-center">
+        @if (Model.PaginasAnteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Anterior</span>
+            </li>
+        }
 
+        @for (int i = 1; i <= Model.PaginasTotales; i++)
+        {
+            <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
+            </li>
+        }
+
+        @if (Model.PaginasPosteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Siguiente</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Siguiente</span>
+            </li>
+        }
+    </ul>
+</nav>
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">

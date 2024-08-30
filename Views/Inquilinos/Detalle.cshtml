@@ -1,6 +1,7 @@
 @model Proyecto_Inmobiliaria_MVC.Models.Inquilinos
 @{
     ViewData["Title"] = "Detalle Inquilino";
+    string estadoTexto = Model.Estado ? "Activo" : "Inactivo";
 }
 <h1>Detalle Inquilino</h1>
 <form >
@@ -28,5 +29,9 @@
         <label for="Telefono" class="form-label">Teléfono</label>
         <input type="text" class="form-control" id="Telefono" name="Telefono" value="@Model.Telefono" readonly/>
     </div>
+    <div class="mb-3">
+    <label for="Estado" class="form-label">Estado</label>
+    <input type="text" class="form-control" id="Estado" name="Estado" value="@estadoTexto" readonly/>
+</div>
 </form>
  <a class="btn btn-info" asp-action="Index">Volver</a>

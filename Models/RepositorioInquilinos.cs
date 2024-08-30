@@ -12,7 +12,7 @@ public class RepositorioInquilinos
 		List<Inquilinos> inquilinos = new List<Inquilinos>();
 		using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
-			var query = $@"SELECT {nameof(Inquilinos.Id_inquilinos)}, {nameof(Inquilinos.Dni)}, {nameof(Inquilinos.Apellido)}, {nameof(Inquilinos.Nombre)}, {nameof(Inquilinos.Email)}, {nameof(Inquilinos.Telefono)} 
+			var query = $@"SELECT {nameof(Inquilinos.Id_inquilinos)}, {nameof(Inquilinos.Dni)}, {nameof(Inquilinos.Apellido)}, {nameof(Inquilinos.Nombre)}, {nameof(Inquilinos.Email)}, {nameof(Inquilinos.Telefono)}
                       FROM inquilinos WHERE Estado = true";
 			using(MySqlCommand command = new MySqlCommand(query, connection))
 			{
@@ -80,7 +80,7 @@ public Inquilinos? ObtenerPorID(int id)
     Inquilinos? res = null;
 using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = @"SELECT Id_inquilinos, Dni, Apellido, Nombre, Email, Telefono 
+        var query = @"SELECT Id_inquilinos, Dni, Apellido, Nombre, Email, Telefono , Estado
                       FROM inquilinos 
                       WHERE Id_inquilinos = @Id AND Estado = true";
     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -100,7 +100,8 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
                         Apellido = reader.GetString(nameof(Inquilinos.Apellido)),
                         Nombre = reader.GetString(nameof(Inquilinos.Nombre)),
                         Email = reader.GetString(nameof(Inquilinos.Email)),
-                        Telefono = reader.GetString(nameof(Inquilinos.Telefono))
+                        Telefono = reader.GetString(nameof(Inquilinos.Telefono)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Inquilinos.Estado)))
                     };
                 }
             }

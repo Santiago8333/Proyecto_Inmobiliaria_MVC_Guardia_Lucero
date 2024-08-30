@@ -13,10 +13,19 @@ public class InquilinosController : Controller
         _logger = logger;
         repo = new RepositorioInquilinos();
     }
+    /*
 public IActionResult Index()
 {
     var lista = repo.ObtenerTodos();
         return View(lista);
+}
+*/
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
+{
+    var inquilinosQueryable = repo.ObtenerTodos().AsQueryable();
+    var paginacion = await Paginacion<Inquilinos>.CrearPaginacion(inquilinosQueryable, pageNumber, pageSize);
+
+    return View(paginacion);
 }
 [HttpPost]
 public IActionResult Agregar(Inquilinos nuevoInquilino)

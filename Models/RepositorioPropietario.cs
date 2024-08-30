@@ -84,7 +84,7 @@ public Propietario? ObtenerPorID(int id)
 
     using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = @"SELECT Id_propietarios, Dni, Apellido, Nombre, Email, Telefono 
+        var query = @"SELECT Id_propietarios, Dni, Apellido, Nombre, Email, Telefono,Estado
                       FROM propietarios 
                       WHERE Id_propietarios = @Id AND Estado = true";
 
@@ -101,12 +101,13 @@ public Propietario? ObtenerPorID(int id)
                 {
                     res = new Propietario
                     {
-                        Id_propietarios = reader.GetInt32("Id_propietarios"),
-                        Dni = reader.GetString("Dni"),
-                        Apellido = reader.GetString("Apellido"),
-                        Nombre = reader.GetString("Nombre"),
-                        Email = reader.GetString("Email"),
-                        Telefono = reader.GetString("Telefono")
+                        Id_propietarios = reader.GetInt32(nameof(Propietario.Id_propietarios)),
+                        Dni = reader.GetString(nameof(Propietario.Dni)),
+                        Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                        Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                        Email = reader.GetString(nameof(Propietario.Email)),
+                        Telefono = reader.GetString(nameof(Propietario.Telefono)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Propietario.Estado)))
                     };
                 }
             }
