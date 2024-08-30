@@ -13,11 +13,11 @@ public class InquilinosController : Controller
         _logger = logger;
         repo = new RepositorioInquilinos();
     }
-    public IActionResult Index()
-    {
-        var lista = repo.ObtenerTodos();
+public IActionResult Index()
+{
+    var lista = repo.ObtenerTodos();
         return View(lista);
-    }
+}
 [HttpPost]
 public IActionResult Agregar(Inquilinos nuevoInquilino)
 {

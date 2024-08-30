@@ -1,4 +1,4 @@
-@model IEnumerable<Proyecto_Inmobiliaria_MVC.Models.Propietario>
+@model Paginacion<Propietario>
 @{
     ViewData["Title"] = "Propietarios";
 }
@@ -47,8 +47,11 @@
                     <a href="@Url.Action("Edicion", "Propietarios", new { id = item.Id_propietarios }) " class="btn btn-primary">
                       <i class="fa-solid fa-pencil"></i>
                   </a>
-                    <a href="@Url.Action("Eliminar", "Propietarios", new { id = item.Id_propietarios })" class="btn btn-danger">
-                      <i class="fa-solid fa-trash"></i>
+                  <a href="javascript:void(0);" 
+                      data-id="@item.Id_propietarios" 
+                      class="btn btn-danger" 
+                      onclick="confirmDelete(this)">
+                        <i class="fa-solid fa-trash"></i>
                   </a>
 				</td>
 			</tr>
@@ -100,27 +103,70 @@
     </div>
   </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas eliminar este propietario?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="confirmDeleteButton" href="#" class="btn btn-danger">Eliminar</a>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Paginación -->
-@if (ViewBag.TotalPropietarios > 10)
-{
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
+<nav aria-label="Navegación de página">
+    <ul class="pagination justify-content-center">
+        @if (Model.PaginasAnteriores)
+        {
             <li class="page-item">
-                <a class="page-link" href="?page=1" aria-label="Previous">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
                     <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Anterior</span>
                 </a>
             </li>
-            <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
-            <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
-            <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Anterior</span>
+            </li>
+        }
+
+        @for (int i = 1; i <= Model.PaginasTotales; i++)
+        {
+            <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
+            </li>
+        }
+
+        @if (Model.PaginasPosteriores)
+        {
             <li class="page-item">
-                <a class="page-link" href="?page=2" aria-label="Next">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
                     <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Siguiente</span>
                 </a>
             </li>
-        </ul>
-    </nav>
-}
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Siguiente</span>
+            </li>
+        }
+    </ul>
+</nav>
+
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
@@ -146,4 +192,11 @@
             </text>
         }
     });
+    function confirmDelete(element) {
+        var id = element.getAttribute("data-id");
+        var url = "@Url.Action("Eliminar", "Propietarios")" + "/" + id;
+        document.getElementById("confirmDeleteButton").setAttribute("href", url);
+        var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        myModal.show();
+    }
 </script>

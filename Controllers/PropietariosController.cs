@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Inmobiliaria_MVC.Models;
 
+
 namespace Proyecto_Inmobiliaria_MVC.Controllers;
 
 public class PropietariosController : Controller
@@ -13,14 +14,21 @@ public class PropietariosController : Controller
         _logger = logger;
         repo = new RepositorioPropietario();
     }
-
+/*
     public IActionResult Index()
     {
         var lista = repo.ObtenerTodos();
         ViewBag.TotalPropietarios = lista.Count();
         return View(lista);
     }
+*/
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
+{
+    var propietariosQueryable = repo.ObtenerTodos().AsQueryable();
+    var paginacion = await Paginacion<Propietario>.CrearPaginacion(propietariosQueryable, pageNumber, pageSize);
 
+    return View(paginacion);
+}
 [HttpPost]
 public IActionResult Agregar(Propietario nuevoPropietario)
 {
