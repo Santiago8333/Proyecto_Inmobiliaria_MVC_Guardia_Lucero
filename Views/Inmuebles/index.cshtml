@@ -1,0 +1,160 @@
+@model InmueblesPropietariosViewModel
+@{
+    ViewData["Title"] = "Inmuebles";
+}
+<div class="text-center">
+    <h1 class="display-4">Lista de Inmuebles</h1>
+</div>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+        <th>Id</th>
+        <th>Uso</th>
+        <th>Tipo</th>
+        <th>Ambiente</th>
+        <th>Precio</th>
+         <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var item in Model.InmueblesPaginados)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id_inmueble)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Uso)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tipo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ambiente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Precio)
+            </td>
+            <td>
+                <a href="@Url.Action("Detalle", "Inmuebles", new { id = item.Id_inmueble }) " class="btn btn-info">
+                    <i class="fa-solid fa-info"></i>
+                </a>
+                <a href="@Url.Action("Edicion", "Inmuebles", new { id = item.Id_inmueble }) " class="btn btn-primary">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+                <a href="javascript:void(0);" 
+                   data-id="@item.Id_inmueble" 
+                   class="btn btn-danger" 
+                   onclick="confirmDelete(this)">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </td>
+        </tr>
+    }
+</tbody>
+</table>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  <i class="fa-solid fa-plus"></i>
+</button>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Inmueble</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="Agregar" method="post" id="formAgregarInmueble">
+                    <div class="mb-3">
+                <label for="exampleInputPropietario" class="form-label">Propietario</label>
+                <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario">
+                <datalist id="propietariosList">
+                    @foreach (var propietario in Model.Propietarios)
+                    {
+                        <option data-id="@propietario.Id_propietarios" value="@propietario.Nombre"></option>
+                    }
+                </datalist>
+                <input type="hidden" id="Id_propietario" name="Id_propietario">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputUso" class="form-label">Uso</label>
+                <select class="form-select" id="exampleInputUso" name="Uso">
+                    <option value="Residencial">Residencial</option>
+                    <option value="Comercial">Comercial</option>
+                </select>
+            </div>
+        <div class="mb-3">
+            <label for="exampleInputApellido" class="form-label">Tipo</label>
+            <select class="form-select" id="exampleInputTipo" name="Tipo">
+                    <option value="local">local</option>
+                    <option value="depósito">deposito</option>
+                    <option value="casa">casa</option>
+                    <option value="departamento">departamento</option>
+                </select>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputAmbiente" class="form-label">Cantidad de Ambiente</label>
+            <input type="text" class="form-control" id="exampleInputAmbiente"  name="Ambiente">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPrecio" class="form-label">Precio</label>
+            <input type="text" class="form-control" id="exampleInputPrecio" name="Precio">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputDireccion" class="form-label">Direccion</label>
+            <input type="text" class="form-control" id="exampleInputDireccion"  name="Direccion">
+        </div>
+         <div class="mb-3">
+            <label for="exampleInputCordenada" class="form-label">Cordenada</label>
+            <input type="text" class="form-control" id="exampleInputCordenada"  name="Cordenada">
+        </div>
+        <button type="submit" class="btn btn-primary" >Agregar</button>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElement = document.getElementById("successToast");
+        var toast = new bootstrap.Toast(toastElement);
+        
+        @if (TempData["Mensaje"] != null)
+        {
+            <text>
+                toast.show();
+            </text>
+        }
+    });
+    function confirmDelete(element) {
+        var id = element.getAttribute("data-id");
+        var url = "@Url.Action("Eliminar", "Inmuebles")" + "/" + id;
+        document.getElementById("confirmDeleteButton").setAttribute("href", url);
+        var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        myModal.show();
+    }
+    //busqueda de propietarios
+ document.getElementById('exampleInputPropietario').addEventListener('input', function() {
+        var input = this;
+        var list = document.getElementById('propietariosList');
+        var hiddenInput = document.getElementById('Id_propietario');
+        var options = list.options;
+
+        hiddenInput.value = '';
+
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].getAttribute('data-id');
+                break;
+            }
+        }
+    });
+</script>
