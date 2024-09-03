@@ -29,4 +29,63 @@ public class InmueblesController : Controller
 
         return View(viewModel);
     }
+[HttpPost]
+public IActionResult Agregar(Inmuebles nuevoInmuebles)
+{
+if (ModelState.IsValid)
+    {
+        repo.AgregarInmuebles(nuevoInmuebles);
+        TempData["Mensaje"] = "Inmueble agregado exitosamente.";
+        return RedirectToAction("Index");
+    }
+    TempData["Mensaje"] = "Hubo un error al agregar el Inmueble.";
+    return RedirectToAction("Index");
+}
+
+public IActionResult Eliminar(int id)
+{
+    var Inmuebles = repo.ObtenerPorID(id);
+    if (Inmuebles == null)
+        {
+            TempData["Mensaje"] = "Inmueble no encontrado.";
+            return RedirectToAction("Index");
+        }
+        repo.EliminarInmuebles(id);
+        TempData["Mensaje"] = "Inmueble eliminado.";
+        return RedirectToAction("Index");
+}
+public IActionResult Edicion(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Inmueble no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var inmuebles = repo.ObtenerPorID(id);
+        if (inmuebles == null)
+        {
+            
+            TempData["Mensaje"] = "Inmueble  no encontrado.";
+            return RedirectToAction("Index");
+        }
+        var propietarios = repo2.ObtenerTodos();
+        ViewBag.Propietarios = propietarios;
+        return View(inmuebles);
+    }
+
+}
+[HttpPost]
+public IActionResult Actualizar(Inmuebles actualizarInmueble)
+{
+if (ModelState.IsValid)
+    {
+        repo.ActualizarInmueble(actualizarInmueble);
+        TempData["Mensaje"] = "Inmueble Modificado correctamente.";
+        return RedirectToAction("Index");
+    }
+TempData["Mensaje"] = "Hubo un error al Modificar el Inmueble.";
+return RedirectToAction("Index");
+}
 }

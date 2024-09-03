@@ -5,7 +5,6 @@ using MySql.Data.MySqlClient;
 namespace Proyecto_Inmobiliaria_MVC.Models;
 public class InmueblesPropietariosViewModel
 {
-    
-      public Paginacion<Inmuebles>? InmueblesPaginados { get; set; }
+    public Paginacion<Inmuebles>? InmueblesPaginados { get; set; }
     public IEnumerable<Propietario>? Propietarios { get; set; }
 }

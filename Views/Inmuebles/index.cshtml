@@ -13,10 +13,13 @@
         <th>Tipo</th>
         <th>Ambiente</th>
         <th>Precio</th>
-         <th>Acciones</th>
+        <th>Propietario</th>
+        <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
+    @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
+{
     @foreach (var item in Model.InmueblesPaginados)
     {
         <tr>
@@ -36,6 +39,9 @@
                 @Html.DisplayFor(modelItem => item.Precio)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.NombrePropietario)
+            </td>
+            <td>
                 <a href="@Url.Action("Detalle", "Inmuebles", new { id = item.Id_inmueble }) " class="btn btn-info">
                     <i class="fa-solid fa-info"></i>
                 </a>
@@ -50,6 +56,7 @@
                 </a>
             </td>
         </tr>
+    }
     }
 </tbody>
 </table>
@@ -71,9 +78,12 @@
                 <label for="exampleInputPropietario" class="form-label">Propietario</label>
                 <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario">
                 <datalist id="propietariosList">
+                    @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
+                    {
                     @foreach (var propietario in Model.Propietarios)
                     {
                         <option data-id="@propietario.Id_propietarios" value="@propietario.Nombre"></option>
+                    }
                     }
                 </datalist>
                 <input type="hidden" id="Id_propietario" name="Id_propietario">
@@ -120,8 +130,84 @@
     </div>
   </div>
 </div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Sistema</strong>
+      <small class="text-muted">justo ahora</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+    <div class="toast-body">
+      @TempData["Mensaje"]
+    </div>
+  </div>
+</div>
+<!-- Modal Eliminar-->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas eliminar este propietario?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="confirmDeleteButton" href="#" class="btn btn-danger">Eliminar</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Paginación -->
+<nav aria-label="Navegación de página">
+    <ul class="pagination justify-content-center">
+        @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
+                    {
+        @if (Model.InmueblesPaginados.PaginasAnteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.InmueblesPaginados.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Anterior</span>
+            </li>
+        }
 
+        @for (int i = 1; i <= Model.InmueblesPaginados.PaginasTotales; i++)
+        {
+            <li class="page-item @(i == Model.InmueblesPaginados.PaginaInicio ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
+            </li>
+        }
 
+        @if (Model.InmueblesPaginados.PaginasPosteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.InmueblesPaginados.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Siguiente</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Siguiente</span>
+            </li>
+        }
+        }
+    </ul>
+</nav>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var toastElement = document.getElementById("successToast");

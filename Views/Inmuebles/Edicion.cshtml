@@ -1,0 +1,98 @@
+@model Proyecto_Inmobiliaria_MVC.Models.Inmuebles
+@{
+    ViewData["Title"] = "Inmuebles Edicion";
+    var selectedResidencial = Model.Uso == "Residencial";
+    var selectedComercial = Model.Uso == "Comercial";
+    var selectedlocal = Model.Tipo == "local";
+    var selecteddeposito = Model.Tipo == "deposito";
+    var selectedcasa = Model.Tipo == "casa";
+    var selecteddepartamento = Model.Tipo == "departamento";
+}
+<h1>Editar Inmuebles</h1>
+        <form asp-action="Actualizar" method="post">
+                    <div class="mb-3">
+                <label for="exampleInputPropietario" class="form-label">Propietario</label>
+                <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario" value="@Model.NombrePropietario">
+                <datalist id="propietariosList">
+                    @foreach (var propietario in ViewBag.Propietarios)
+                        {
+                            <option data-id="@propietario.Id_propietarios" value="@propietario.Nombre">@propietario.Nombre</option>
+                        }
+                </datalist>
+                <input type="hidden" id="Id_propietario" name="Id_propietario" value="@Model.Id_propietario">
+            </div>
+                <div class="mb-3">
+        <label for="exampleInputUso" class="form-label">Uso</label>
+                <select class="form-select" id="exampleInputUso" name="Uso">
+                    @if(selectedResidencial){
+                        <option value="Residencial" selected>Residencial</option>
+                        <option value="Comercial" >Comercial</option>
+                    }else{
+                        <option value="Residencial">Residencial</option>
+                        <option value="Comercial" selected>Comercial</option>
+                    }
+                </select>
+            </div>
+        <div class="mb-3">
+            <label for="exampleInputApellido" class="form-label">Tipo</label>
+            <select class="form-select" id="exampleInputTipo" name="Tipo">
+                    @if(selectedlocal){
+                    <option value="local" selected>local</option>
+                    <option value="depósito">deposito</option>
+                    <option value="casa">casa</option>
+                    <option value="departamento">departamento</option>
+                    }else if(selecteddeposito){
+                    <option value="local">local</option>
+                    <option value="depósito" selected>deposito</option>
+                    <option value="casa">casa</option>
+                    <option value="departamento">departamento</option>
+                    }else if(selectedcasa){
+                    <option value="local">local</option>
+                    <option value="depósito">deposito</option>
+                    <option value="casa" selected>casa</option>
+                    <option value="departamento">departamento</option>
+                    }else if(selecteddepartamento){
+                    <option value="local">local</option>
+                    <option value="depósito">deposito</option>
+                    <option value="casa">casa</option>
+                    <option value="departamento" selected>departamento</option>
+                    }
+                </select>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputAmbiente" class="form-label">Cantidad de Ambiente</label>
+            <input type="text" class="form-control" id="exampleInputAmbiente"  name="Ambiente" value="@Model.Ambiente">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPrecio" class="form-label">Precio</label>
+            <input type="text" class="form-control" id="exampleInputPrecio" name="Precio" value="@Model.Precio">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputDireccion" class="form-label">Direccion</label>
+            <input type="text" class="form-control" id="exampleInputDireccion"  name="Direccion" value="@Model.Direccion">
+        </div>
+         <div class="mb-3">
+            <label for="exampleInputCordenada" class="form-label">Cordenada</label>
+            <input type="text" class="form-control" id="exampleInputCordenada"  name="Cordenada" value="@Model.Cordenada">
+        </div>
+        <button type="submit" class="btn btn-primary" >Modificar</button>
+        </form>
+         <a class="btn btn-info" asp-action="Index">Volver</a>
+<script>
+//busqueda de propietarios
+ document.getElementById('exampleInputPropietario').addEventListener('input', function() {
+        var input = this;
+        var list = document.getElementById('propietariosList');
+        var hiddenInput = document.getElementById('Id_propietario');
+        var options = list.options;
+
+        hiddenInput.value = '';
+
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].getAttribute('data-id');
+                break;
+            }
+        }
+    });
+</script>
