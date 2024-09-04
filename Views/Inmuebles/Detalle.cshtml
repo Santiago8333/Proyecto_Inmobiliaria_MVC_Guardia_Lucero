@@ -1,0 +1,49 @@
+@model Proyecto_Inmobiliaria_MVC.Models.Inmuebles
+@{
+    ViewData["Title"] = "Inmuebles Detalle";
+    string estadoTexto = Model.Estado ? "Activo" : "Inactivo";
+}
+<h1>Inmueble detalle</h1>
+<form>
+    <div class="mb-3">
+        <label for="Id_inmueble" class="form-label">Id_Inmueble</label>
+        <input type="text" class="form-control" id="Id_inmueble" name="Id_inmueble" value="@Model.Id_inmueble" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Id_propietario" class="form-label">Id_Propietario</label>
+        <input type="text" class="form-control" id="Id_propietario" name="Id_propietario" value="@Model.Id_propietario" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="NombrePropietario" class="form-label">Nombre del Propietario</label>
+        <input type="text" class="form-control" id="NombrePropietario" name="NombrePropietario" value="@Model.NombrePropietario" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Uso" class="form-label">Uso</label>
+        <input type="text" class="form-control" id="Uso" name="Uso" value="@Model.Uso" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Tipo" class="form-label">Tipo</label>
+        <input type="text" class="form-control" id="Tipo" name="Tipo" value="@Model.Tipo" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Ambiente" class="form-label">Ambiente</label>
+        <input type="text" class="form-control" id="Ambiente" name="Ambiente" value="@Model.Ambiente" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Precio" class="form-label">Precio</label>
+        <input type="text" class="form-control" id="Precio" name="Precio" value="@Model.Precio" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Direccion" class="form-label">Direccion</label>
+        <input type="text" class="form-control" id="Direccion" name="Direccion" value="@Model.Direccion" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Cordenada" class="form-label">Cordenada</label>
+        <input type="text" class="form-control" id="Cordenada" name="Cordenada" value="@Model.Cordenada" readonly/>
+    </div>
+    <div class="mb-3">
+    <label for="Estado" class="form-label">Estado</label>
+    <input type="text" class="form-control" id="Estado" name="Estado" value="@estadoTexto" readonly/>
+    </div>
+</form>
+ <a class="btn btn-info" asp-action="Index">Volver</a>

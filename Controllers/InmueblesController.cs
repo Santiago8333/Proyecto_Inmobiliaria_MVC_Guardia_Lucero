@@ -88,4 +88,24 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "Hubo un error al Modificar el Inmueble.";
 return RedirectToAction("Index");
 }
+public IActionResult Detalle(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Inmueble no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var Inmueble = repo.ObtenerPorID(id);
+        if (Inmueble == null)
+        {
+            TempData["Mensaje"] = "Inmueble no encontrado.";
+            return RedirectToAction("Index");
+        }
+        
+        return View(Inmueble);
+    }
+
+}
 }

@@ -143,17 +143,16 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
     var query = $@"UPDATE
                     inmuebles
                 SET 
-                    i.{nameof(Inmuebles.Id_propietario)} = @Id_propietario,
-                    i.{nameof(Inmuebles.Uso)}= @Uso,
-                    i.{nameof(Inmuebles.Tipo)}= @Tipo,
-                    i.{nameof(Inmuebles.Ambiente)}= @Ambiente,
-                    i.{nameof(Inmuebles.Precio)}= @Precio,
-                    i.{nameof(Inmuebles.Direccion)}= @Direccion,
-                    i.{nameof(Inmuebles.Cordenada)}= @Cordenada
-                WHERE Id_inmueble = @Id AND Estado = true";
+                    {nameof(Inmuebles.Id_propietario)} = @Id_propietario,
+                    {nameof(Inmuebles.Uso)}= @Uso,
+                    {nameof(Inmuebles.Tipo)}= @Tipo,
+                    {nameof(Inmuebles.Ambiente)}= @Ambiente,
+                    {nameof(Inmuebles.Precio)}= @Precio,
+                    {nameof(Inmuebles.Direccion)}= @Direccion,
+                    {nameof(Inmuebles.Cordenada)}= @Cordenada
+                WHERE Id_inmueble = @Id_inmueble AND Estado = true";
  using(MySqlCommand command = new MySqlCommand(query, connection))
     {
-
         command.Parameters.AddWithValue("@Id_propietario", actualizarInmueble.Id_propietario);
         command.Parameters.AddWithValue("@Uso", actualizarInmueble.Uso);
         command.Parameters.AddWithValue("@Tipo", actualizarInmueble.Tipo);
@@ -161,7 +160,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         command.Parameters.AddWithValue("@Precio", actualizarInmueble.Precio);
         command.Parameters.AddWithValue("@Direccion", actualizarInmueble.Direccion);
         command.Parameters.AddWithValue("@Cordenada", actualizarInmueble.Cordenada);
-
+        command.Parameters.AddWithValue("@Id_inmueble", actualizarInmueble.Id_inmueble);
         connection.Open();
         command.ExecuteNonQuery(); 
         connection.Close();
