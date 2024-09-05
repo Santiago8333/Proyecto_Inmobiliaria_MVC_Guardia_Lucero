@@ -141,4 +141,32 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         }
     }
 }
+public void ActualizarContrato(Contrato actualizarContrato)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE contrato 
+               SET 
+                   {nameof(Contrato.Id_inquilino)} = @Id_inquilino, 
+                   {nameof(Contrato.Id_inmueble)} = @Id_inmueble, 
+                   {nameof(Contrato.Monto)} = @Monto,
+                   {nameof(Contrato.Fecha_desde)} = @Fecha_desde,
+                   {nameof(Contrato.Fecha_hasta)} = @Fecha_hasta
+               WHERE Id_contrato = @Id AND Estado = true";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id_inquilino", actualizarContrato.Id_inquilino);
+            command.Parameters.AddWithValue("@Id_inmueble", actualizarContrato.Id_inmueble);
+            command.Parameters.AddWithValue("@Monto", actualizarContrato.Monto);
+            command.Parameters.AddWithValue("@Fecha_desde", actualizarContrato.Fecha_desde);
+            command.Parameters.AddWithValue("@Fecha_hasta", actualizarContrato.Fecha_hasta);
+            command.Parameters.AddWithValue("@Id", actualizarContrato.Id_contrato);
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+
+    }
+
+}
 }

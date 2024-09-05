@@ -3,3 +3,82 @@
     ViewData["Title"] = "Contrato Edicion";
 }
 <h1>Editar Contrato</h1>
+<form asp-action="Actualizar" method="post" id="formEditarContrato">
+<div class="mb-3">
+<label for="exampleInputEmail" class="form-label">Editar Inquilino</label>
+<input list="inquilinosList" type="email" class="form-control" id="exampleInputEmail" name="Email" value="@Model.Emailinquilino">
+<input type="hidden" id="Id_inquilinos" name="Id_inquilino" value="@Model.Id_inquilino">
+<input type="hidden" class="form-control" id="Id_contrato" name="Id_contrato" value="@Model.Id_contrato" />
+<datalist id="inquilinosList">
+@foreach (var inquilino in ViewBag.Inquilinos)
+{
+<option data-id="@inquilino.Id_inquilinos" value="@inquilino.Email">@inquilino.Email</option>
+}
+ </datalist>
+</div>
+<div class="mb-3">
+<label for="exampleInputTipo" class="form-label">Editar Inmueble</label>
+    <input list="inmueblesList" type="text" class="form-control" id="exampleInputTipo"  name="Tipo" value="@Model.Inmuebletipo">
+    <input type="hidden" id="Id_inmueble" name="Id_inmueble" value="@Model.Id_inmueble">
+    <datalist id="inmueblesList">
+        @foreach (var inmuebles in ViewBag.Inmuebles)
+            {
+            <option data-id="@inmuebles.Id_inmueble" value="@inmuebles.Tipo">@inmuebles.Tipo</option>
+            }
+    </datalist>
+</div>
+<div class="mb-3">
+    <label for="exampleInputMonto" class="form-label">Monto</label>
+    <input type="text" class="form-control" id="exampleInputMonto"  name="Monto" value="@Model.Monto">
+</div>
+<div class="mb-3">
+    <label for="exampleInputFecha_desde" class="form-label">Fecha desde</label>
+    <input type="date" class="form-control" id="exampleInputFecha_desde" name="Fecha_desde" value="@Model.Fecha_desde.ToString("yyyy-MM-dd")">
+</div>
+<div class="mb-3">
+    <label for="exampleInputFecha_hasta" class="form-label">Fecha hasta</label>
+    <input type="date" class="form-control" id="exampleInputFecha_hasta"  name="Fecha_hasta" value="@Model.Fecha_hasta.ToString("yyyy-MM-dd")">
+</div>
+<button type="submit" class="btn btn-primary" >Editar</button>
+    </form>
+    <br>
+<a href="@Url.Action("Edicion", "Inmuebles", new { id = @Model.Id_inmueble }) " class="btn btn-info">
+   <i class="fa-solid fa-info"></i>
+   <label>Editar el Inmueble asociado al contrato</label>
+ </a>
+  <a href="@Url.Action("Edicion", "Inquilinos", new { id = @Model.Id_inquilino }) " class="btn btn-info">
+   <i class="fa-solid fa-info"></i>
+   <label>Editar el inquilino asociado al contrato</label>
+ </a>
+<script>
+         document.getElementById('exampleInputEmail').addEventListener('input', function() {
+        var input = this;
+        var list = document.getElementById('inquilinosList');
+        var hiddenInput = document.getElementById('Id_inquilinos');
+        var options = list.options;
+
+        hiddenInput.value = '';
+
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].getAttribute('data-id');
+                break;
+            }
+        }
+    });
+     document.getElementById('exampleInputTipo').addEventListener('input', function() {
+        var input = this;
+        var list = document.getElementById('inmueblesList');
+        var hiddenInput = document.getElementById('Id_inmueble');
+        var options = list.options;
+
+        hiddenInput.value = '';
+
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].getAttribute('data-id');
+                break;
+            }
+        }
+    });
+</script>

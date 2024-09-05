@@ -76,4 +76,39 @@ public IActionResult Agregar(Contrato nuevoContrato)
     TempData["Mensaje"] = "Hubo un error al agregar el Contrato.";
     return RedirectToAction("Index");
 }
+public IActionResult Edicion(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Contrato no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var contrato = repo.ObtenerPorID(id);
+        if (contrato == null)
+        {
+            TempData["Mensaje"] = "Contrato no encontrado.";
+            return RedirectToAction("Index");
+        }
+            var inquilinos = repo2.ObtenerTodos();
+            ViewBag.Inquilinos = inquilinos;
+            var inmuebles = repo3.ObtenerTodos();
+            ViewBag.Inmuebles = inmuebles;
+        return View(contrato);
+    }
+
+}
+[HttpPost]
+public IActionResult Actualizar(Contrato actualizarContrato)
+{
+if (ModelState.IsValid)
+    {
+        repo.ActualizarContrato(actualizarContrato);
+        TempData["Mensaje"] = "Contrato Modificado correctamente.";
+        return RedirectToAction("Index");
+    }
+TempData["Mensaje"] = "Hubo un error al Modificar el Contrato.";
+return RedirectToAction("Index");
+}
 }
