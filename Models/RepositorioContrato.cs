@@ -21,7 +21,7 @@ public List<Contrato> ObtenerTodos()
                 c.Fecha_desde,
                 c.Fecha_hasta,
                 inq.Email AS Emailinquilino,
-                i.Uso AS Inmuebleuso
+                i.Tipo AS Inmuebletipo
             FROM
                 contrato c
             JOIN inmuebles i ON i.Id_inmueble = c.Id_inmueble
@@ -43,7 +43,7 @@ public List<Contrato> ObtenerTodos()
                     Fecha_desde = reader.GetDateTime("Fecha_desde"),
                     Fecha_hasta = reader.GetDateTime("Fecha_hasta"),
                     Emailinquilino = reader.GetString("Emailinquilino"),
-                    Inmuebleuso = reader.GetString("Inmuebleuso"),
+                    Inmuebletipo = reader.GetString("Inmuebletipo"),
                 });
             }
             connection.Close();
@@ -65,7 +65,7 @@ public Contrato? ObtenerPorID(int id)
                             c.Fecha_desde,
                             c.Fecha_hasta,
                             inq.Email AS Emailinquilino,
-                            i.Uso AS Inmuebleuso,
+                            i.Tipo AS Inmuebletipo,
                             c.Estado
                         FROM
                             contrato c
@@ -93,7 +93,7 @@ public Contrato? ObtenerPorID(int id)
                     Fecha_desde = reader.GetDateTime(nameof(Contrato.Fecha_desde)),
                     Fecha_hasta = reader.GetDateTime(nameof(Contrato.Fecha_hasta)),
                     Emailinquilino = reader.GetString(nameof(Contrato.Emailinquilino)),
-                    Inmuebleuso = reader.GetString(nameof(Contrato.Inmuebleuso)),
+                    Inmuebletipo = reader.GetString(nameof(Contrato.Inmuebletipo)),
                     Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado)))
                     };
                 }
@@ -101,6 +101,44 @@ public Contrato? ObtenerPorID(int id)
         }
     }
 
-    return res; // Retorna el propietario o null si no se encontró
+    return res; 
+}
+public void EliminarContrato(int id)
+{
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE contrato
+                       SET {nameof(Contrato.Estado)} = @Estado
+                       WHERE Id_contrato = @Id";
+using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Estado", false); 
+			command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+
+}
+public void AgregarContrato(Contrato nuevoContrato)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.Estado)})
+                    VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Fecha_desde,@Fecha_hasta, @Estado)";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id_inquilino", nuevoContrato.Id_inquilino);
+            command.Parameters.AddWithValue("@Id_inmueble", nuevoContrato.Id_inmueble);
+            command.Parameters.AddWithValue("@Monto", nuevoContrato.Monto);
+            command.Parameters.AddWithValue("@Fecha_desde", nuevoContrato.Fecha_desde);
+            command.Parameters.AddWithValue("@Fecha_hasta", nuevoContrato.Fecha_hasta);
+            command.Parameters.AddWithValue("@Estado", true);
+            connection.Open();
+            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            connection.Close();
+        }
+    }
 }
 }

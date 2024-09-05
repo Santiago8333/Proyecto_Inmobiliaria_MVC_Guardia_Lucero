@@ -34,7 +34,7 @@ public class RepositorioPropietario
 			return propietarios;
 		}
 	}
-		public void AgregarPropietario(Propietario nuevoPropietario)
+public void AgregarPropietario(Propietario nuevoPropietario)
 {
 	
     using(MySqlConnection connection = new MySqlConnection(ConectionString))

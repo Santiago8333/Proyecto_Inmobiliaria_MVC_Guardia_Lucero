@@ -10,7 +10,7 @@
     <tr>
         <th>Id_Contrato</th>
         <th>Email del inquilino</th>
-        <th>Uso del Inmueble</th>
+        <th>Tipo de Inmueble</th>
         <th>Monto</th>
         <th>Fecha desde</th>
         <th>Fecha_hasta</th>
@@ -28,7 +28,7 @@
 					@Html.DisplayFor(modelItem => item.Emailinquilino)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.Inmuebleuso)
+					@Html.DisplayFor(modelItem => item.Inmuebletipo)
 				</td>
                 <td>
 					@Html.DisplayFor(modelItem => item.Monto)
@@ -57,6 +57,64 @@
 		}
   </tbody>
 </table>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Contrato</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="Agregar" method="post" id="formAgregarContrato">
+            <div class="mb-3">
+            <label for="exampleInputEmail" class="form-label">Email del Inquilino</label>
+            <input list="inquilinosList" type="email" class="form-control" id="exampleInputEmail" name="Email">
+            <input type="hidden" id="Id_inquilinos" name="Id_inquilino" value="">
+            <datalist id="inquilinosList">
+              @foreach (var inquilino in ViewBag.Inquilinos)
+                  {
+                    <option data-id="@inquilino.Id_inquilinos" value="@inquilino.Email">@inquilino.Email</option>
+                  }
+            </datalist>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputTipo" class="form-label">Tipo de Inmueble</label>
+            <input list="inmueblesList" type="text" class="form-control" id="exampleInputTipo"  name="Tipo">
+            <input type="hidden" id="Id_inmueble" name="Id_inmueble" value="">
+            <datalist id="inmueblesList">
+              @foreach (var inmuebles in ViewBag.Inmuebles)
+                  {
+                    <option data-id="@inmuebles.Id_inmueble" value="@inmuebles.Tipo">@inmuebles.Tipo</option>
+                  }
+            </datalist>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputMonto" class="form-label">Monto</label>
+            <input type="text" class="form-control" id="exampleInputMonto"  name="Monto">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputFecha_desde" class="form-label">Fecha desde</label>
+            <input type="date" class="form-control" id="exampleInputFecha_desde" name="Fecha_desde">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputFecha_hasta" class="form-label">Fecha hasta</label>
+            <input type="date" class="form-control" id="exampleInputFecha_hasta"  name="Fecha_hasta">
+        </div>
+        <button type="submit" class="btn btn-primary" >Agregar</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal toats-->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -153,4 +211,34 @@
         var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
         myModal.show();
     }
+     document.getElementById('exampleInputEmail').addEventListener('input', function() {
+        var input = this;
+        var list = document.getElementById('inquilinosList');
+        var hiddenInput = document.getElementById('Id_inquilinos');
+        var options = list.options;
+
+        hiddenInput.value = '';
+
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].getAttribute('data-id');
+                break;
+            }
+        }
+    });
+     document.getElementById('exampleInputTipo').addEventListener('input', function() {
+        var input = this;
+        var list = document.getElementById('inmueblesList');
+        var hiddenInput = document.getElementById('Id_inmueble');
+        var options = list.options;
+
+        hiddenInput.value = '';
+
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].getAttribute('data-id');
+                break;
+            }
+        }
+    });
 </script>
