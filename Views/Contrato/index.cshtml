@@ -1,20 +1,19 @@
-@model Paginacion<Propietario>
+@model Paginacion<Contrato>
 @{
-    ViewData["Title"] = "Propietarios";
+    ViewData["Title"] = "Contratos";
 }
-
 <div class="text-center">
-	<h1 class="display-4">Lista de Propietarios</h1>
+	<h1 class="display-4">Lista de Contratos</h1>
 </div>
 <table class="table table-striped table-hover">
   <thead>
     <tr>
-        <th>Id</th>
-        <th>Dni</th>
-        <th>Apellido</th>
-        <th>Nombre</th>
-        <th>Email</th>
-        <th>Telefono</th>
+        <th>Id_Contrato</th>
+        <th>Email del inquilino</th>
+        <th>Uso del Inmueble</th>
+        <th>Monto</th>
+        <th>Fecha desde</th>
+        <th>Fecha_hasta</th>
         <th>Acciones</th>
     </tr>
   </thead>
@@ -23,32 +22,32 @@
 		{
 			<tr>
 				<td>
-					@Html.DisplayFor(modelItem => item.Id_propietarios)
+					@Html.DisplayFor(modelItem => item.Id_contrato)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.Dni)
+					@Html.DisplayFor(modelItem => item.Emailinquilino)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.Apellido)
+					@Html.DisplayFor(modelItem => item.Inmuebleuso)
 				</td>
                 <td>
-					@Html.DisplayFor(modelItem => item.Nombre)
+					@Html.DisplayFor(modelItem => item.Monto)
 				</td>
+               <td>
+                    @item.Fecha_desde.ToString("dd-MM-yyyy")
+                </td>
                 <td>
-					@Html.DisplayFor(modelItem => item.Email)
-				</td>
+                    @item.Fecha_hasta.ToString("dd-MM-yyyy")
+                </td>
                 <td>
-					@Html.DisplayFor(modelItem => item.Telefono)
-				</td>
-                <td>
-                  <a href="@Url.Action("Detalle", "Propietarios", new { id = item.Id_propietarios }) " class="btn btn-info">
+                  <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
                       <i class="fa-solid fa-info"></i>
                   </a>
-                    <a href="@Url.Action("Edicion", "Propietarios", new { id = item.Id_propietarios }) " class="btn btn-primary">
+                    <a href="@Url.Action("Edicion", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
                       <i class="fa-solid fa-pencil"></i>
                   </a>
-                  <a href="javascript:void(0);" 
-                      data-id="@item.Id_propietarios" 
+                     <a href="javascript:void(0);" 
+                      data-id="@item.Id_contrato" 
                       class="btn btn-danger" 
                       onclick="confirmDelete(this)">
                         <i class="fa-solid fa-trash"></i>
@@ -58,48 +57,16 @@
 		}
   </tbody>
 </table>
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  <i class="fa-solid fa-plus"></i>
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Propietarios</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form asp-action="Agregar" method="post" id="formAgregarPropietario">
-            <div class="mb-3">
-            <label for="exampleInputDni" class="form-label">Dni</label>
-            <input type="text" class="form-control" id="exampleInputDni" name="Dni">
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputApellido" class="form-label">Apellido</label>
-            <input type="text" class="form-control" id="exampleInputApellido"  name="Apellido">
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputNombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="exampleInputNombre"  name="Nombre">
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Email</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" name="Email">
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputTelefono" class="form-label">Telefono</label>
-            <input type="text" class="form-control" id="exampleInputTelefono"  name="Telefono">
-        </div>
-        <button type="submit" class="btn btn-primary" >Agregar</button>
-
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+<!-- Modal toats-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Sistema</strong>
+      <small class="text-muted">justo ahora</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+    <div class="toast-body">
+      @TempData["Mensaje"]
     </div>
   </div>
 </div>
@@ -166,20 +133,6 @@
         }
     </ul>
 </nav>
-
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Sistema</strong>
-      <small class="text-muted">justo ahora</small>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
-    </div>
-    <div class="toast-body">
-      @TempData["Mensaje"]
-    </div>
-  </div>
-</div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var toastElement = document.getElementById("successToast");
@@ -191,10 +144,11 @@
                 toast.show();
             </text>
         }
+      
     });
     function confirmDelete(element) {
         var id = element.getAttribute("data-id");
-        var url = "@Url.Action("Eliminar", "Propietarios")" + "/" + id;
+        var url = "@Url.Action("Eliminar", "Contrato")" + "/" + id;
         document.getElementById("confirmDeleteButton").setAttribute("href", url);
         var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
         myModal.show();

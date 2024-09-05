@@ -1,0 +1,45 @@
+@model Proyecto_Inmobiliaria_MVC.Models.Contrato
+@{
+    ViewData["Title"] = "Detalle Contrato";
+    string estadoTexto = Model.Estado ? "Activo" : "Inactivo";
+}
+<h1>Detalle Contrato</h1>
+<form >
+    <div class="mb-3">
+        <label for="Id_Contrato" class="form-label">Id_Contrato</label>
+        <input type="text" class="form-control" id="Id_Contrato" name="Id_Contrato" value="@Model.Id_contrato" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Id_inquilino" class="form-label">Id_inquilino</label>
+        <input type="text" class="form-control" id="Id_inquilino" name="Id_inquilino" value="@Model.Id_inquilino" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Id_inmueble" class="form-label">Id_inmueble</label>
+        <input type="text" class="form-control" id="Id_inmueble" name="Id_inmueble" value="@Model.Id_inmueble" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Monto" class="form-label">Monto</label>
+        <input type="text" class="form-control" id="Monto" name="Monto" value="@Model.Monto"readonly />
+    </div>
+    <div class="mb-3">
+        <label for="Fecha_desde" class="form-label">Fecha_desde</label>
+        <input type="text" class="form-control" id="Fecha_desde" name="Fecha_desde" value="@Model.Fecha_desde.ToString("dd-MM-yyyy")" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Fecha_hasta" class="form-label">Fecha_hasta</label>
+        <input type="text" class="form-control" id="Fecha_hasta" name="Fecha_hasta" value="@Model.Fecha_hasta.ToString("dd-MM-yyyy")" readonly/>
+    </div>
+    <div class="mb-3">
+    <label for="Estado" class="form-label">Estado</label>
+    <input type="text" class="form-control" id="Estado" name="Estado" value="@estadoTexto" readonly/>
+</div>
+</form>
+<a href="@Url.Action("Detalle", "Inmuebles", new { id = @Model.Id_inmueble }) " class="btn btn-info">
+   <i class="fa-solid fa-info"></i>
+   <label>Detalle del Inmueble asociado al contrato</label>
+ </a>
+ <a href="@Url.Action("Detalle", "Inquilinos", new { id = @Model.Id_inquilino }) " class="btn btn-info">
+   <i class="fa-solid fa-info"></i>
+   <label>Detalle del inquilino asociado al contrato</label>
+ </a>
+ <a class="btn btn-info" asp-action="Index">Volver</a>

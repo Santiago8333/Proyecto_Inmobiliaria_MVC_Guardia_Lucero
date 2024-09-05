@@ -16,5 +16,32 @@ public class ContratoController : Controller
 
     }
 
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
+{
+    var contratosQueryable = repo.ObtenerTodos().AsQueryable();
+    var paginacion = await Paginacion<Contrato>.CrearPaginacion(contratosQueryable, pageNumber, pageSize);
+
+    return View(paginacion);
+}
+public IActionResult Detalle(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Contrato no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var contrato = repo.ObtenerPorID(id);
+        if (contrato == null)
+        {
+            TempData["Mensaje"] = "Contrato no encontrado.";
+            return RedirectToAction("Index");
+        }
+        
+        return View(contrato);
+    }
+
+}
 
 }
