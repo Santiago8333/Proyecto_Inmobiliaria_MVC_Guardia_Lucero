@@ -11,12 +11,12 @@
 <h1>Editar Inmuebles</h1>
         <form asp-action="Actualizar" method="post">
                     <div class="mb-3">
-                <label for="exampleInputPropietario" class="form-label">Propietario</label>
-                <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario" value="@Model.NombrePropietario">
+                <label for="exampleInputPropietario" class="form-label">Email del Propietario</label>
+                <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario" value="@Model.EmailPropietario">
                 <datalist id="propietariosList">
                     @foreach (var propietario in ViewBag.Propietarios)
                         {
-                            <option data-id="@propietario.Id_propietarios" value="@propietario.Nombre">@propietario.Nombre</option>
+                            <option data-id="@propietario.Id_propietarios" value="@propietario.Email">@propietario.Email</option>
                         }
                 </datalist>
                 <input type="hidden" id="Id_propietario" name="Id_propietario" value="@Model.Id_propietario">

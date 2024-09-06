@@ -10,6 +10,7 @@
     <tr>
         <th>Id_Contrato</th>
         <th>Email del inquilino</th>
+        <th>Email del Propietario</th>
         <th>Tipo de Inmueble</th>
         <th>Monto</th>
         <th>Fecha desde</th>
@@ -28,9 +29,12 @@
 					@Html.DisplayFor(modelItem => item.Emailinquilino)
 				</td>
 				<td>
+					@Html.DisplayFor(modelItem => item.EmailPropietario)
+				</td>
+        <td>
 					@Html.DisplayFor(modelItem => item.Inmuebletipo)
 				</td>
-                <td>
+        <td>
 					@Html.DisplayFor(modelItem => item.Monto)
 				</td>
                <td>

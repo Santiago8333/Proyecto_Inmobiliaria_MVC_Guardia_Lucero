@@ -13,7 +13,8 @@
         <th>Tipo</th>
         <th>Ambiente</th>
         <th>Precio</th>
-        <th>Propietario</th>
+        <th>Nombre Propietario</th>
+        <th>Email Propietario</th>
         <th>Acciones</th>
     </tr>
   </thead>
@@ -40,6 +41,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.NombrePropietario)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailPropietario)
             </td>
             <td>
                 <a href="@Url.Action("Detalle", "Inmuebles", new { id = item.Id_inmueble }) " class="btn btn-info">
@@ -75,14 +79,14 @@
       <div class="modal-body">
         <form asp-action="Agregar" method="post" id="formAgregarInmueble">
                     <div class="mb-3">
-                <label for="exampleInputPropietario" class="form-label">Propietario</label>
+                <label for="exampleInputPropietario" class="form-label">Email del Propietario</label>
                 <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario">
                 <datalist id="propietariosList">
                     @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
                     {
                     @foreach (var propietario in Model.Propietarios)
                     {
-                        <option data-id="@propietario.Id_propietarios" value="@propietario.Nombre"></option>
+                        <option data-id="@propietario.Id_propietarios" value="@propietario.Email"></option>
                     }
                     }
                 </datalist>

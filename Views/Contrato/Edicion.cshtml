@@ -17,13 +17,13 @@
  </datalist>
 </div>
 <div class="mb-3">
-<label for="exampleInputTipo" class="form-label">Editar Inmueble</label>
-    <input list="inmueblesList" type="text" class="form-control" id="exampleInputTipo"  name="Tipo" value="@Model.Inmuebletipo">
+<label for="exampleInputTipo" class="form-label">Inmueble Direccion</label>
+    <input list="inmueblesList" type="text" class="form-control" id="exampleInputTipo"  name="Tipo" value="@Model.Inmuebledireccion">
     <input type="hidden" id="Id_inmueble" name="Id_inmueble" value="@Model.Id_inmueble">
     <datalist id="inmueblesList">
         @foreach (var inmuebles in ViewBag.Inmuebles)
             {
-            <option data-id="@inmuebles.Id_inmueble" value="@inmuebles.Tipo">@inmuebles.Tipo</option>
+            <option data-id="@inmuebles.Id_inmueble" value="@inmuebles.Direccion">@inmuebles.Direccion</option>
             }
     </datalist>
 </div>
@@ -42,12 +42,12 @@
 <button type="submit" class="btn btn-primary" >Editar</button>
     </form>
     <br>
-<a href="@Url.Action("Edicion", "Inmuebles", new { id = @Model.Id_inmueble }) " class="btn btn-info">
-   <i class="fa-solid fa-info"></i>
+<a href="@Url.Action("Edicion", "Inmuebles", new { id = @Model.Id_inmueble }) " class="btn btn-primary">
+    <i class="fa-solid fa-pencil"></i>
    <label>Editar el Inmueble asociado al contrato</label>
  </a>
-  <a href="@Url.Action("Edicion", "Inquilinos", new { id = @Model.Id_inquilino }) " class="btn btn-info">
-   <i class="fa-solid fa-info"></i>
+  <a href="@Url.Action("Edicion", "Inquilinos", new { id = @Model.Id_inquilino }) " class="btn btn-primary">
+   <i class="fa-solid fa-pencil"></i>
    <label>Editar el inquilino asociado al contrato</label>
  </a>
 <script>

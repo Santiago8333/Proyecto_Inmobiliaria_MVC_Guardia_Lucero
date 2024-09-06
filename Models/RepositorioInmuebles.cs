@@ -12,7 +12,7 @@ public class RepositorioInmuebles{
         List<Inmuebles> inmuebles = new List<Inmuebles>();
     using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
-            var query = $@"SELECT {nameof(Inmuebles.Id_inmueble)},{nameof(Inmuebles.Uso)},{nameof(Inmuebles.Tipo)},{nameof(Inmuebles.Ambiente)},{nameof(Inmuebles.Precio)},p.Nombre AS NombrePropietario
+            var query = $@"SELECT {nameof(Inmuebles.Id_inmueble)},{nameof(Inmuebles.Uso)},{nameof(Inmuebles.Tipo)},{nameof(Inmuebles.Ambiente)},{nameof(Inmuebles.Precio)},{nameof(Inmuebles.Direccion)},p.Nombre AS NombrePropietario,p.Email AS EmailPropietario
                       FROM inmuebles i
                       JOIN 
                         propietarios p ON p.Id_propietarios = i.Id_propietario
@@ -30,7 +30,9 @@ public class RepositorioInmuebles{
                         Tipo = reader.GetString(nameof(Inmuebles.Tipo)),
                         Ambiente = reader.GetString(nameof(Inmuebles.Ambiente)),
                         Precio = reader.GetInt32(nameof(Inmuebles.Precio)),
-                        NombrePropietario = reader.GetString("NombrePropietario")
+                         Direccion = reader.GetString(nameof(Inmuebles.Direccion)),
+                        NombrePropietario = reader.GetString("NombrePropietario"),
+                        EmailPropietario = reader.GetString("EmailPropietario"),
 					});
 				}
                 connection.Close();
@@ -98,7 +100,8 @@ public Inmuebles? ObtenerPorID(int id)
                         i.{nameof(Inmuebles.Direccion)},
                         i.{nameof(Inmuebles.Cordenada)},
                         i.{nameof(Inmuebles.Estado)},
-                        p.Nombre AS NombrePropietario
+                        p.Nombre AS NombrePropietario,
+                        p.Email AS EmailPropietario
                     FROM
                         inmuebles i
                     JOIN 
@@ -127,7 +130,8 @@ public Inmuebles? ObtenerPorID(int id)
                         Direccion = reader.GetString(nameof(Inmuebles.Direccion)),
                         Cordenada = reader.GetString(nameof(Inmuebles.Cordenada)),
                         Estado = reader.GetBoolean(nameof(Inmuebles.Estado)),
-                        NombrePropietario = reader.GetString(nameof(Inmuebles.NombrePropietario))
+                        NombrePropietario = reader.GetString(nameof(Inmuebles.NombrePropietario)),
+                        EmailPropietario = reader.GetString(nameof(Inmuebles.EmailPropietario))
                     };
                 }
             }

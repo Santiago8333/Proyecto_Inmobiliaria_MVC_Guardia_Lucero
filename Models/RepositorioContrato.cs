@@ -21,11 +21,13 @@ public List<Contrato> ObtenerTodos()
                 c.Fecha_desde,
                 c.Fecha_hasta,
                 inq.Email AS Emailinquilino,
-                i.Tipo AS Inmuebletipo
+                i.Tipo AS Inmuebletipo,
+                pro.Email AS EmailPropietario
             FROM
                 contrato c
             JOIN inmuebles i ON i.Id_inmueble = c.Id_inmueble
             JOIN inquilinos inq ON inq.Id_inquilinos = c.Id_inquilino
+            JOIN propietarios pro ON pro.Id_propietarios = i.Id_propietario
             WHERE c.Estado = true";
         
         using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -44,6 +46,7 @@ public List<Contrato> ObtenerTodos()
                     Fecha_hasta = reader.GetDateTime("Fecha_hasta"),
                     Emailinquilino = reader.GetString("Emailinquilino"),
                     Inmuebletipo = reader.GetString("Inmuebletipo"),
+                    EmailPropietario = reader.GetString("EmailPropietario"),
                 });
             }
             connection.Close();
@@ -66,11 +69,14 @@ public Contrato? ObtenerPorID(int id)
                             c.Fecha_hasta,
                             inq.Email AS Emailinquilino,
                             i.Tipo AS Inmuebletipo,
-                            c.Estado
+                            c.Estado,
+                            pro.Email AS EmailPropietario,
+                            i.Direccion AS Inmuebledireccion
                         FROM
                             contrato c
                         JOIN inmuebles i ON i.Id_inmueble = c.Id_inmueble
                         JOIN inquilinos inq ON inq.Id_inquilinos = c.Id_inquilino
+                        JOIN propietarios pro ON pro.Id_propietarios = i.Id_propietario
                       WHERE c.Id_contrato = @Id AND c.Estado = true";
 
         using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -94,7 +100,9 @@ public Contrato? ObtenerPorID(int id)
                     Fecha_hasta = reader.GetDateTime(nameof(Contrato.Fecha_hasta)),
                     Emailinquilino = reader.GetString(nameof(Contrato.Emailinquilino)),
                     Inmuebletipo = reader.GetString(nameof(Contrato.Inmuebletipo)),
-                    Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado)))
+                    Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado))),
+                    EmailPropietario = reader.GetString(nameof(Contrato.EmailPropietario)),
+                    Inmuebledireccion = reader.GetString(nameof(Contrato.Inmuebledireccion))
                     };
                 }
             }
