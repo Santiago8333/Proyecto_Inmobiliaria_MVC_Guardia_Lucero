@@ -41,7 +41,7 @@ public List<Contrato> ObtenerTodos()
                     Id_contrato = reader.GetInt32("Id_contrato"),
                     Id_inmueble = reader.GetInt32("Id_inmueble"),
                     Id_inquilino = reader.GetInt32("Id_inquilino"),
-                    Monto = reader.GetInt32("Monto"),
+                    Monto = reader.GetDecimal("Monto"),
                     Fecha_desde = reader.GetDateTime("Fecha_desde"),
                     Fecha_hasta = reader.GetDateTime("Fecha_hasta"),
                     Emailinquilino = reader.GetString("Emailinquilino"),
@@ -67,6 +67,7 @@ public Contrato? ObtenerPorID(int id)
                             c.Monto,
                             c.Fecha_desde,
                             c.Fecha_hasta,
+                            c.Monto_Pagar,
                             inq.Email AS Emailinquilino,
                             i.Tipo AS Inmuebletipo,
                             c.Estado,
@@ -95,14 +96,15 @@ public Contrato? ObtenerPorID(int id)
                     Id_contrato = reader.GetInt32(nameof(Contrato.Id_contrato)),
                     Id_inmueble = reader.GetInt32(nameof(Contrato.Id_inmueble)),
                     Id_inquilino = reader.GetInt32(nameof(Contrato.Id_inquilino)),
-                    Monto = reader.GetInt32(nameof(Contrato.Monto)),
+                    Monto = reader.GetDecimal(nameof(Contrato.Monto)),
                     Fecha_desde = reader.GetDateTime(nameof(Contrato.Fecha_desde)),
                     Fecha_hasta = reader.GetDateTime(nameof(Contrato.Fecha_hasta)),
                     Emailinquilino = reader.GetString(nameof(Contrato.Emailinquilino)),
                     Inmuebletipo = reader.GetString(nameof(Contrato.Inmuebletipo)),
                     Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado))),
                     EmailPropietario = reader.GetString(nameof(Contrato.EmailPropietario)),
-                    Inmuebledireccion = reader.GetString(nameof(Contrato.Inmuebledireccion))
+                    Inmuebledireccion = reader.GetString(nameof(Contrato.Inmuebledireccion)),
+                    Monto_Pagar = reader.GetDecimal(nameof(Contrato.Monto_Pagar))
                     };
                 }
             }
@@ -133,8 +135,8 @@ public void AgregarContrato(Contrato nuevoContrato)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.Estado)})
-                    VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Fecha_desde,@Fecha_hasta, @Estado)";
+        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.Estado)},{nameof(Contrato.Monto_Pagar)})
+                    VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Fecha_desde,@Fecha_hasta,@Monto_Pagar, @Estado)";
         using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@Id_inquilino", nuevoContrato.Id_inquilino);
@@ -142,6 +144,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Monto", nuevoContrato.Monto);
             command.Parameters.AddWithValue("@Fecha_desde", nuevoContrato.Fecha_desde);
             command.Parameters.AddWithValue("@Fecha_hasta", nuevoContrato.Fecha_hasta);
+            command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto);
             command.Parameters.AddWithValue("@Estado", true);
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
@@ -176,5 +179,86 @@ public void ActualizarContrato(Contrato actualizarContrato)
 
     }
 
+}
+public List<Pago> ObtenerPagoDelContrato(int id)
+{
+
+List<Pago> pagos = new List<Pago>();
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT
+                        p.Id_pago,
+                        p.Id_contrato,
+                        p.Fecha_pago,
+                        p.Monto,
+                        p.Estado,
+                        c.Monto AS MontoTotalApagar
+                    FROM
+                        pago p
+                    JOIN contrato c ON
+                        c.Id_contrato = p.Id_contrato
+                    WHERE
+                        c.Id_contrato = @Id AND p.Estado = TRUE";
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+            pagos.Add(new Pago
+                {
+                     Id_pago = reader.GetInt32("Id_pago"),
+                     Id_contrato = reader.GetInt32("Id_contrato"),
+                     Fecha_pago = reader.GetDateTime("Fecha_pago"),
+                     Monto = reader.GetInt32("Monto"),
+                     Estado = reader.GetBoolean("Estado"),
+                     MontoTotalApagar = reader.GetDecimal("MontoTotalApagar")
+                });
+                
+            }
+            connection.Close();
+        }
+    }
+    
+    return pagos.Any() ? pagos : pagos = new List<Pago>();;
+}
+public void AgregarPago(Pago nuevoPago)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+    var query = $@"INSERT INTO pago ({nameof(Pago.Id_contrato)},{nameof(Pago.Fecha_pago)},{nameof(Pago.Monto)},{nameof(Pago.Estado)})
+                VALUES (@Id_contrato, @Fecha_pago, @Monto,@Estado)";
+     using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id_contrato", nuevoPago.Id_contrato);
+            command.Parameters.AddWithValue("@Fecha_pago", nuevoPago.Fecha_pago);
+            command.Parameters.AddWithValue("@Monto", nuevoPago.Monto);
+            command.Parameters.AddWithValue("@Estado", true);
+            connection.Open();
+            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            connection.Close();
+        }
+    }
+}
+public void ActualizarContratoMontoPagar(Contrato contrato)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE contrato 
+               SET 
+                   {nameof(Contrato.Monto_Pagar)} = @Monto_Pagar
+               WHERE Id_contrato = @Id AND Estado = true";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id", contrato.Id_contrato);
+            command.Parameters.AddWithValue("@Monto_Pagar", contrato.Monto_Pagar);
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+
+    }
 }
 }

@@ -34,6 +34,10 @@
         <input type="text" class="form-control" id="Monto" name="Monto" value="@Model.Monto"readonly />
     </div>
     <div class="mb-3">
+        <label for="Monto_Pagar" class="form-label">Monto que falta pagar</label>
+        <input type="text" class="form-control" id="Monto_Pagar" name="Monto_Pagar" value="@Model.Monto_Pagar"readonly />
+    </div>
+    <div class="mb-3">
         <label for="Fecha_desde" class="form-label">Fecha_desde</label>
         <input type="text" class="form-control" id="Fecha_desde" name="Fecha_desde" value="@Model.Fecha_desde.ToString("dd-MM-yyyy")" readonly/>
     </div>
@@ -53,5 +57,9 @@
  <a href="@Url.Action("Detalle", "Inquilinos", new { id = @Model.Id_inquilino }) " class="btn btn-info">
    <i class="fa-solid fa-info"></i>
    <label>Detalle del inquilino asociado al contrato</label>
+ </a>
+  <a href="@Url.Action("Pago","Contrato", new { id = @Model.Id_contrato }) " class="btn btn-info">
+   <i class="fa-solid fa-info"></i>
+   <label>Pagos asociado al contrato</label>
  </a>
  <a class="btn btn-info" asp-action="Index">Volver</a>

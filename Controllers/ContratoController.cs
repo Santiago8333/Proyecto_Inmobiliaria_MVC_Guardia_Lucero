@@ -51,8 +51,8 @@ public IActionResult Detalle(int id)
 }
 public IActionResult Eliminar(int id)
 {
-  var propietario = repo.ObtenerPorID(id);
-        if (propietario == null)
+  var contrato = repo.ObtenerPorID(id);
+        if (contrato == null)
         {
             TempData["Mensaje"] = "Contrato no encontrado.";
             return RedirectToAction("Index");
@@ -110,5 +110,75 @@ if (ModelState.IsValid)
     }
 TempData["Mensaje"] = "Hubo un error al Modificar el Contrato.";
 return RedirectToAction("Index");
+}
+public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize = 5)
+{
+    // Verifica si el contrato es válido o no
+    if(id == 0)
+    {
+        TempData["Mensaje"] = "Contrato no válido.";
+        return RedirectToAction("Index");
+    }
+    //Verificar si el contrato existe
+      var contrato = repo.ObtenerPorID(id);
+    if (contrato == null)
+    {
+        TempData["Mensaje"] = "Contrato no encontrado.";
+        return RedirectToAction("Index");
+    }
+    var pagos = repo.ObtenerPagoDelContrato(id);
+
+    // Si no hay pagos, permitimos que la vista se muestre vacía
+    if (pagos == null || !pagos.Any())
+    {
+        ViewBag.Mensaje = "No hay pagos registrados para este contrato.";
+        pagos = new List<Pago>();  // Inicializa una lista vacía de pagos
+    }
+     // Calcular el total
+     var primerPago = pagos.FirstOrDefault();
+    decimal? monto = primerPago?.MontoTotalApagar;
+    int? Id_contrato = primerPago?.Id_contrato;
+    // Realiza la paginación, aunque la lista esté vacía
+    var pagosQueryable = pagos.AsQueryable();
+    var paginacion = await Paginacion<Pago>.CrearPaginacion(pagosQueryable, pageNumber, pageSize);
+    ViewBag.totalApagarMonto = monto; 
+    ViewBag.Id_contrato = Id_contrato;
+    return View(paginacion);
+}
+[HttpPost]
+public IActionResult AgregarPago(Pago nuevoPago)
+{
+    if (!ModelState.IsValid)
+    {
+        TempData["Mensaje"] = "Hubo un error al agregar el Pago al Contrato.";
+        return RedirectToAction("Index");
+    }
+
+    // Obtener el contrato correspondiente
+    var contrato = repo.ObtenerPorID(nuevoPago.Id_contrato);
+    
+    if (contrato == null)
+    {
+        TempData["Mensaje"] = "Contrato no encontrado.";
+        return RedirectToAction("Index");
+    }
+    //veirificar pago
+    if (nuevoPago.Monto > contrato.Monto_Pagar || nuevoPago.Monto <= 0)
+    {
+        TempData["Mensaje"] = "Monto ingersado del pago Incorrecto.";
+        return RedirectToAction("Index");
+    }
+    // Actualizar el monto a pagar del contrato
+    var nuevoMontoPagar = contrato.Monto_Pagar - nuevoPago.Monto;
+    contrato.Monto_Pagar = nuevoMontoPagar;
+    
+    // Actualizar el contrato en la base de datos
+    repo.ActualizarContratoMontoPagar(contrato);
+
+    // Agregar el nuevo pago
+    repo.AgregarPago(nuevoPago);
+
+    TempData["Mensaje"] = "Pago agregado al Contrato exitosamente.";
+    return RedirectToAction("Index");
 }
 }

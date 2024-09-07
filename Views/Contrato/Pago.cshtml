@@ -1,0 +1,163 @@
+@model Paginacion<Pago>
+@{
+    ViewData["Title"] = "Pagos Asocaidos al Contratos";
+    decimal totalMonto = 0;
+    var totalApagarMonto = ViewBag.totalApagarMonto ?? 0;
+    var MontoQueFaltaPagar = totalApagarMonto;
+    var Id_contrato = ViewBag.Id_contrato;
+}
+<div class="text-center">
+	<h1 class="display-4">Pagos Asocaidos al Contratos</h1>
+</div>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+        <th>Id_Pago</th>
+        <th>Id_Contrato</th>
+        <th>Fecha del pago</th>
+        <th>Monto</th>
+        <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+        @foreach (var item in Model)
+		{
+             // Sumar el monto
+            totalMonto += item.Monto;
+            //resta para calcular lo que falta pagar
+            MontoQueFaltaPagar -= item.Monto;
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Id_pago)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Id_contrato)
+				</td>
+                <td>
+					@item.Fecha_pago.ToString("dd-MM-yyyy")
+				</td>
+                <td>
+					@item.Monto
+				</td>
+                <td>
+                     <a href="javascript:void(0);" 
+                      data-id="@item.Id_pago" 
+                      class="btn btn-danger" 
+                      onclick="confirmDelete(this)">
+                        <i class="fa-solid fa-trash"></i>
+                  </a>
+                  </td>
+			</tr>
+		}
+        <tr>
+            <td><strong>Monto Total a pagar: </strong>@totalApagarMonto</td>
+            <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
+            <td colspan="3"><strong>Monto Total Pagado: </strong>@totalMonto</td>
+        </tr>
+  </tbody>
+</table>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Pago</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="AgregarPago" method="post" id="formAgregarPago">
+            <div class="mb-3">
+            <label for="exampleInputFecha_pago" class="form-label">Fecha del pago</label>
+            <input type="hidden" id="Id_contrato" name="Id_contrato" value="@Id_contrato" readonly>
+            <input type="date" class="form-control" id="exampleInputFecha_pago" name="Fecha_pago">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputMonto" class="form-label">Monto</label>
+            <input type="number" class="form-control" id="exampleInputMonto"  name="Monto" min="0" max="@MontoQueFaltaPagar">
+        </div>
+        <button type="submit" class="btn btn-primary" >Agregar</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal eliminar-->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas eliminar este Pago?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="confirmDeleteButton" href="#" class="btn btn-danger">Eliminar</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Paginación -->
+<nav aria-label="Navegación de página">
+    <ul class="pagination justify-content-center">
+        @if (Model.PaginasAnteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Pago" asp-route-id="@ViewBag.Id_contrato" asp-route-pageNumber="@(Model.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Anterior</span>
+            </li>
+        }
+
+        @for (int i = 1; i <= Model.PaginasTotales; i++)
+        {
+            <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
+                <a class="page-link" asp-action="Pago" asp-route-id="@ViewBag.Id_contrato" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
+            </li>
+        }
+
+        @if (Model.PaginasPosteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Pago" asp-route-id="@ViewBag.Id_contrato" asp-route-pageNumber="@(Model.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Siguiente</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Siguiente</span>
+            </li>
+        }
+    </ul>
+</nav>
+<script>
+        function confirmDelete(element) {
+        var id = element.getAttribute("data-id");
+        var url = "@Url.Action("EliminarPago", "Contrato")" + "/" + id;
+        document.getElementById("confirmDeleteButton").setAttribute("href", url);
+        var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        myModal.show();
+    }
+</script>

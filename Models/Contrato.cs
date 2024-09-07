@@ -11,5 +11,6 @@ public class Contrato{
      public decimal Monto {get;set;}
      public DateTime Fecha_desde {get;set;}
      public DateTime Fecha_hasta {get;set;}
+     public decimal Monto_Pagar {get;set;}
      public bool Estado {get;set;} = false;
 }
