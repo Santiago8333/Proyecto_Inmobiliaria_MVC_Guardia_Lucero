@@ -1,10 +1,10 @@
 @model Paginacion<Pago>
 @{
     ViewData["Title"] = "Pagos Asocaidos al Contratos";
-    decimal totalMonto = 0;
-    var totalApagarMonto = ViewBag.totalApagarMonto ?? 0;
-    var MontoQueFaltaPagar = totalApagarMonto;
     var Id_contrato = ViewBag.Id_contrato;
+    decimal sumapagos = ViewBag.sumpagos;
+    decimal MontoTotal = ViewBag.MontoTotal;
+    decimal MontoQueFaltaPagar = ViewBag.MontoQueFaltaPagar;
 }
 <div class="text-center">
 	<h1 class="display-4">Pagos Asocaidos al Contratos</h1>
@@ -22,10 +22,7 @@
   <tbody>
         @foreach (var item in Model)
 		{
-             // Sumar el monto
-            totalMonto += item.Monto;
-            //resta para calcular lo que falta pagar
-            MontoQueFaltaPagar -= item.Monto;
+ 
 			<tr>
 				<td>
 					@Html.DisplayFor(modelItem => item.Id_pago)
@@ -50,9 +47,9 @@
 			</tr>
 		}
         <tr>
-            <td><strong>Monto Total a pagar: </strong>@totalApagarMonto</td>
+            <td><strong>Monto Total a pagar: </strong>@MontoTotal</td>
             <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
-            <td colspan="3"><strong>Monto Total Pagado: </strong>@totalMonto</td>
+            <td colspan="3"><strong>Monto Total Pagado: </strong>@sumapagos</td>
         </tr>
   </tbody>
 </table>
@@ -78,7 +75,7 @@
         </div>
         <div class="mb-3">
             <label for="exampleInputMonto" class="form-label">Monto</label>
-            <input type="number" class="form-control" id="exampleInputMonto"  name="Monto" min="0" max="@MontoQueFaltaPagar">
+            <input type="number" class="form-control" id="exampleInputMonto"  name="Monto" >
         </div>
         <button type="submit" class="btn btn-primary" >Agregar</button>
         </form>

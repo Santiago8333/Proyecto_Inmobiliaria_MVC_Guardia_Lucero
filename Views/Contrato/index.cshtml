@@ -50,6 +50,9 @@
                     <a href="@Url.Action("Edicion", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
                       <i class="fa-solid fa-pencil"></i>
                   </a>
+                  <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
+                      <i class="fa-solid fa-money-bill"></i>
+                  </a>
                      <a href="javascript:void(0);" 
                       data-id="@item.Id_contrato" 
                       class="btn btn-danger" 

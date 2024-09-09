@@ -212,7 +212,7 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
                      Id_pago = reader.GetInt32("Id_pago"),
                      Id_contrato = reader.GetInt32("Id_contrato"),
                      Fecha_pago = reader.GetDateTime("Fecha_pago"),
-                     Monto = reader.GetInt32("Monto"),
+                     Monto = reader.GetDecimal("Monto"),
                      Estado = reader.GetBoolean("Estado"),
                      MontoTotalApagar = reader.GetDecimal("MontoTotalApagar")
                 });
@@ -260,5 +260,63 @@ public void ActualizarContratoMontoPagar(Contrato contrato)
         }
 
     }
+}
+
+public void EliminarPago(int id)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {        var query = $@"UPDATE pago 
+                       SET {nameof(Pago.Estado)} = @Estado
+                       WHERE Id_pago = @Id";
+using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Estado", false); 
+			command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+}
+public Pago? ObtenerPagoPorID(int id)
+{
+    Pago? res = null;
+  using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+         var query = @"SELECT
+                        p.Id_pago,
+                        p.Id_contrato,
+                        p.Fecha_pago,
+                        p.Monto,
+                        p.Estado
+                    FROM
+                        pago p
+                    WHERE
+                        p.Id_pago = @Id AND p.Estado = TRUE";
+     using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+
+            connection.Open();
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Pago
+                    {
+                    Id_pago = reader.GetInt32(nameof(Pago.Id_pago)),
+                    Id_contrato = reader.GetInt32(nameof(Pago.Id_contrato)),
+                    Fecha_pago = reader.GetDateTime(nameof(Pago.Fecha_pago)),
+                    Monto = reader.GetInt32(nameof(Pago.Monto)),
+                    Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado)))
+
+                    };
+                }
+            }
+        }
+    }
+     return res; 
 }
 }
