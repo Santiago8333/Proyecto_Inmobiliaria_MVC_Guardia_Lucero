@@ -319,4 +319,23 @@ public Pago? ObtenerPagoPorID(int id)
     }
      return res; 
 }
+public void ActualizarPago(Pago actualizarPago)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+       var query = $@"UPDATE pago SET
+                   {nameof(Pago.Fecha_pago)} = @Fecha_pago, 
+                   {nameof(Pago.Monto)} = @Monto
+               WHERE Id_pago = @Id AND Estado = true";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Fecha_pago", actualizarPago.Fecha_pago);
+            command.Parameters.AddWithValue("@Monto", actualizarPago.Monto);
+            command.Parameters.AddWithValue("@Id", actualizarPago.Id_pago);
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+    }
+}
 }
