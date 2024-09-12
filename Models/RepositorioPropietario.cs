@@ -2,9 +2,10 @@ using MySql.Data.MySqlClient;
 
 namespace Proyecto_Inmobiliaria_MVC.Models;
 
-public class RepositorioPropietario
+public class RepositorioPropietario 
 {
-    string ConectionString = "Server=localhost;User=root;Password=;Database=proyecto_inmobiliaria_mvc_guardia_lucero;SslMode=none";
+    private readonly string ConectionString = "Server=localhost;User=root;Password=;Database=proyecto_inmobiliaria_mvc_guardia_lucero;SslMode=none";
+
 
     public List<Propietario> ObtenerTodos()
 	{
