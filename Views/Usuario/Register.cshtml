@@ -1,0 +1,40 @@
+@{
+    ViewData["Title"] = "Usuario Register";
+}
+<div class="container form-container d-flex justify-content-center align-items-center">
+    <form class="row g-4 col-md-4">
+        <div class="col-md-12">
+            <h1>Register</h1>
+        </div>
+        <div class="col-md-12">
+            <label for="Nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="Nombre" name="Nombre" required>
+        </div>
+        <div class="col-md-12">
+            <label for="Apellido" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="Apellido" name="Apellido" required>
+        </div>
+        <div class="col-md-12">
+            <label for="Email" class="form-label">Email</label>
+            <input type="Email" class="form-control" id="Email" name="Email" required>
+        </div>
+        <div class="col-md-12">
+            <label for="Password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="Password" name="Password" required>
+        </div>
+        <div class="col-md-12">
+            <label for="Avatar" class="form-label">Avatar</label>
+            <input type="file" class="form-control" id="Avatar" name="Avatar" required>
+        </div>
+        <div class="col-md-12">
+            <label for="Rol" class="form-label">Rol</label>
+            <select class="form-select" required aria-label="select example" id="Rol">
+            <option value="1">Empleado</option>
+            <option value="2">Administrador</option>
+            </select>
+        </div>
+        <div class="col-12">
+            <button class="btn btn-primary w-100" type="submit">Registrar</button>
+        </div>
+    </form>
+</div>
