@@ -35,4 +35,42 @@ public class RepositorioUsuario
             return usuarios;
         }
     }
+public async Task<Usuario?> ObtenerPorEmailAsync(string email)
+{
+    Usuario? res = null;
+
+    using (var connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_usuario, Nombre, Apellido, Email, RolNombre, Clave
+                      FROM usuario
+                      WHERE Email = @Email AND Estado = true";
+
+        using (var command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro Email
+            command.Parameters.AddWithValue("@Email", email);
+
+            await connection.OpenAsync(); // Abre la conexión de manera asincrónica
+
+            using (var reader = await command.ExecuteReaderAsync()) // Ejecuta el lector asincrónicamente
+            {
+                if (await reader.ReadAsync()) // Lee de forma asincrónica
+                {
+                    res = new Usuario
+                    {
+                        Id_usuario = reader.GetInt32(reader.GetOrdinal("Id_usuario")),
+                        Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
+                        Apellido = reader.GetString(reader.GetOrdinal("Apellido")),
+                        Email = reader.GetString(reader.GetOrdinal("Email")),
+                        RolNombre = reader.GetString(reader.GetOrdinal("RolNombre")),
+                        Clave = reader.GetString(reader.GetOrdinal("Clave")) 
+                    };
+                }
+            }
+        }
+    }
+
+    return res; // Retorna el usuario o null si no se encontró
+}
+
 }

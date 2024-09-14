@@ -11,17 +11,16 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(options =>//el sitio web valida con cookie
 	{
-		options.LoginPath = "/Usuarios/Login";
-		options.LogoutPath = "/Usuarios/Logout";
+		options.LoginPath = "/Usuario/Login";
+		options.LogoutPath = "/Usuario/Logout";
 		options.AccessDeniedPath = "/Home/Restringido";
-		//options.ExpireTimeSpan = TimeSpan.FromMinutes(5);//Tiempo de expiración
+		options.ExpireTimeSpan = TimeSpan.FromMinutes(5);//Tiempo de expiración
 	});
 builder.Services.AddAuthorization(options =>
 {
 	options.AddPolicy("Empleado", policy => policy.RequireClaim(ClaimTypes.Role, "Administrador", "Empleado"));
 	//options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador", "SuperAdministrador"));
 });
-
 
 
 var app = builder.Build();

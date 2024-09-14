@@ -1,9 +1,10 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Inmobiliaria_MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Proyecto_Inmobiliaria_MVC.Controllers;
-
+[Authorize]
 public class InmueblesController : Controller
 {
       private readonly ILogger<InmueblesController> _logger;

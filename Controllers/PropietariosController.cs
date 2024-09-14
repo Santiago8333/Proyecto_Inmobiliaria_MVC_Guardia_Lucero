@@ -1,10 +1,11 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Inmobiliaria_MVC.Models;
 
 
 namespace Proyecto_Inmobiliaria_MVC.Controllers;
-
+[Authorize]
 public class PropietariosController : Controller
 {
 
@@ -26,6 +27,7 @@ public class PropietariosController : Controller
         return View(lista);
     }
 */
+
 public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
 {
     var propietariosQueryable = repo.ObtenerTodos().AsQueryable();
