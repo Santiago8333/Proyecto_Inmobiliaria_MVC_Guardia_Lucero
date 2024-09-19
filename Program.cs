@@ -13,15 +13,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 	{
 		options.LoginPath = "/Usuario/Login";
 		options.LogoutPath = "/Usuario/Logout";
-		options.AccessDeniedPath = "/Home/Restringido";
+		options.AccessDeniedPath = "/Home/Registringido";
 		options.ExpireTimeSpan = TimeSpan.FromMinutes(5);//Tiempo de expiración
 	});
 builder.Services.AddAuthorization(options =>
 {
-	options.AddPolicy("Empleado", policy => policy.RequireClaim(ClaimTypes.Role, "Administrador", "Empleado"));
-	//options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador", "SuperAdministrador"));
+	options.AddPolicy("Empleado", policy => policy.RequireClaim(ClaimTypes.Role, "Empleado"));
+	options.AddPolicy("Administrador", policy => policy.RequireRole(ClaimTypes.Role,"Administrador"));
 });
-
+// Asegúrate de que `appsettings.json` se cargue por defecto
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 var app = builder.Build();
 

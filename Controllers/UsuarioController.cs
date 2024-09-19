@@ -4,21 +4,26 @@ using Proyecto_Inmobiliaria_MVC.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.Configuration;
 
 namespace Proyecto_Inmobiliaria_MVC.Controllers;
 
 public class UsuarioController : Controller
 {
+private readonly IConfiguration configuration;
 private readonly ILogger<UsuarioController> _logger;
-private RepositorioUsuario repo;
+private readonly RepositorioUsuario repo;
 
-    public UsuarioController(ILogger<UsuarioController> logger)
+    public UsuarioController(IConfiguration configuration,ILogger<UsuarioController> logger)
     {
         _logger = logger;
         repo = new RepositorioUsuario();
+        this.configuration = configuration;
    
     }
+[Authorize(Policy = "Administrador")]
 public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
 {
     var UsuarioQueryable = repo.ObtenerTodos().AsQueryable();
@@ -90,4 +95,49 @@ return View();
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Login", "Usuario");
     }
+public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
+{
+    //verificar si el email ya esta registrado
+    var e = await repo.ObtenerPorEmailAsync(nuevoUsuario.Email);
+    if(e != null){
+    if(nuevoUsuario.Email == e.Email){
+        TempData["Mensaje"] = "Error: EL email de ese usuario ya esta registrado.";
+        return RedirectToAction("Index");
+    }
+    }
+    Console.WriteLine("afuera: " + nuevoUsuario);
+    if (ModelState.IsValid)
+    {
+        Console.WriteLine("dentro: " + nuevoUsuario);
+        // Asegurarse de que la clave no sea nula
+            string saltValue = configuration["Salt"];
+             //string saltValue = "EsteEsMiValorDeSal12345";
+            if (string.IsNullOrEmpty(saltValue))
+            {
+                throw new InvalidOperationException("El valor de Salt no está configurado correctamente.");
+            }
+        //hashear clave
+        string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+								password: nuevoUsuario.Clave,
+								salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]),
+								prf: KeyDerivationPrf.HMACSHA1,
+								iterationCount: 1000,
+								numBytesRequested: 256 / 8));
+		nuevoUsuario.Clave = hashed;
+        //verificar rengo
+        if(nuevoUsuario.Rol == 1){
+            nuevoUsuario.RolNombre = "Administrador";
+        }else{
+            nuevoUsuario.RolNombre = "Empleado";
+        }
+
+        repo.AgregarUsuario(nuevoUsuario);
+        TempData["Mensaje"] = "Usuario agregado exitosamente.";
+        return RedirectToAction("Index");
+    }
+
+    TempData["Mensaje"] = "Hubo un error al agregar el Usuario.";
+    
+    return RedirectToAction("Index");
+}
 }

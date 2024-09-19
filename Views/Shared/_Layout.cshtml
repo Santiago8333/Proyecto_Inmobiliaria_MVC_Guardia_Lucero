@@ -49,6 +49,10 @@
                 <li class="nav-item">
                     <a class="nav-link text-dark" asp-area="" asp-controller="Usuario" asp-action="Index">Usuario</a>
                 </li>
+                }else{
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Usuario" asp-action="Index">Perfil</a>
+                </li>
                 }
                 }
             </ul>
@@ -58,6 +62,11 @@
             {
             <div class="d-flex align-items-center ml-auto">
                 <span class="me-2">@User.Identity.Name</span>
+                @if(User.IsInRole("Administrador")){
+                    <span class="me-2">Rango: Administrador</span>
+                }else{
+                    <span class="me-2">Rango: Empleado</span>
+                }
                 <img src="~/images/avatar.png" class="rounded-circle" alt="avatar" style="width: 40px; height: 40px;">
                 <a class="nav-link text-dark" asp-area="" asp-controller="Usuario" asp-action="Logout">Salir</a>
             </div>

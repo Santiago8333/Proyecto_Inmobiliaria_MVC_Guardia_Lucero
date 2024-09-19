@@ -72,5 +72,27 @@ public async Task<Usuario?> ObtenerPorEmailAsync(string email)
 
     return res; // Retorna el usuario o null si no se encontró
 }
+public void AgregarUsuario(Usuario nuevoUsuario)
+{
+     using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"INSERT INTO usuario ({nameof(Usuario.Nombre)}, {nameof(Usuario.Apellido)}, {nameof(Usuario.Email)}, {nameof(Usuario.Clave)}, {nameof(Usuario.Rol)}, {nameof(Usuario.RolNombre)},{nameof(Usuario.Estado)})
+                    VALUES (@Nombre, @Apellido, @Email,@Clave,@Rol, @RolNombre, @Estado)";
+         using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            
+            command.Parameters.AddWithValue("@Nombre", nuevoUsuario.Nombre);
+            command.Parameters.AddWithValue("@Apellido", nuevoUsuario.Apellido);
+            command.Parameters.AddWithValue("@Email", nuevoUsuario.Email);
+            command.Parameters.AddWithValue("@Clave", nuevoUsuario.Clave);
+            command.Parameters.AddWithValue("@Rol", nuevoUsuario.Rol);
+            command.Parameters.AddWithValue("@RolNombre", nuevoUsuario.RolNombre);
+            command.Parameters.AddWithValue("@Estado", true); 
 
+            connection.Open();
+            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            connection.Close();
+        }
+    }
+}
 }

@@ -1,5 +1,6 @@
 {
 	"ConnectionStrings": {
 		"MySql": "Server=localhost;User=root;Password=;Database=proyecto_inmobiliaria_mvc_guardia_lucero;SslMode=none"
-	}
+	},
+  "Salt": "EsteEsMiValorDeSal12345"
 }
