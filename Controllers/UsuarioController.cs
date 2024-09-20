@@ -57,14 +57,20 @@ return View();
         {
             
             // Aquí iría tu lógica de autenticación
-
+            // Hash de la contraseña ingresada por el usuario durante el login
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: loginusuario.Clave,
+                salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]), // Asegúrate de usar la misma sal que usaste al registrar el usuario
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 1000,
+                numBytesRequested: 256 / 8));
             var e = await repo.ObtenerPorEmailAsync(loginusuario.Email);
             //Console.WriteLine("Clave de la cuenta: " + e.Email);
-            Console.WriteLine("Clave ingresada: " + loginusuario.Clave);
-            if (e == null || e.Clave != loginusuario.Clave)
+            //Console.WriteLine("Clave ingresada: " + loginusuario.Clave+" hasehd: "+hashed);
+            if (e == null || e.Clave != hashed)
 				{
                    
-					TempData["Mensaje"] = "Email: "+loginusuario.Email+" contraseña incorrecta: ."+loginusuario.Clave;
+					TempData["Mensaje"] = "Credenciales ingresadas incorrectas";
                     TempData["Mensaje2"] = "Credenciales ingresadas incorrectas";
                     TempData["MensajeTipo"] = "danger";
 					return RedirectToAction("Login");
@@ -105,24 +111,16 @@ public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
         return RedirectToAction("Index");
     }
     }
-    Console.WriteLine("afuera: " + nuevoUsuario);
+    //Console.WriteLine("afuera: " + nuevoUsuario);
     if (ModelState.IsValid)
     {
-        Console.WriteLine("dentro: " + nuevoUsuario);
-        // Asegurarse de que la clave no sea nula
-            string saltValue = configuration["Salt"];
-             //string saltValue = "EsteEsMiValorDeSal12345";
-            if (string.IsNullOrEmpty(saltValue))
-            {
-                throw new InvalidOperationException("El valor de Salt no está configurado correctamente.");
-            }
-        //hashear clave
+        //Console.WriteLine("dentro: " + nuevoUsuario);
         string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-								password: nuevoUsuario.Clave,
-								salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]),
-								prf: KeyDerivationPrf.HMACSHA1,
-								iterationCount: 1000,
-								numBytesRequested: 256 / 8));
+                password: nuevoUsuario.Clave,
+                salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]), 
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 1000,
+                numBytesRequested: 256 / 8));
 		nuevoUsuario.Clave = hashed;
         //verificar rengo
         if(nuevoUsuario.Rol == 1){
@@ -139,5 +137,18 @@ public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
     TempData["Mensaje"] = "Hubo un error al agregar el Usuario.";
     
     return RedirectToAction("Index");
+}
+public IActionResult Eliminar(int id)
+{
+    var usuario = repo.ObtenerPorID(id);
+    if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }
+        repo.EliminarUsuario(id);
+TempData["Mensaje"] = "Usuario Eliminado.";
+ return RedirectToAction("Index");
+
 }
 }

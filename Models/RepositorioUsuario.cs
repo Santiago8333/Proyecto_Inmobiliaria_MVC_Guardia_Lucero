@@ -95,4 +95,56 @@ public void AgregarUsuario(Usuario nuevoUsuario)
         }
     }
 }
+public void EliminarUsuario(int id)
+{
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE usuario 
+                       SET {nameof(Usuario.Estado)} = @Estado
+                       WHERE Id_usuario = @Id AND Estado = 1";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Estado", false); 
+			command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+}
+public Usuario? ObtenerPorID(int id)
+{
+    Usuario? res = null;
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_usuario,Apellido, Nombre, Email, Clave,AvatarFile,Rol,RolNombre,Estado
+                      FROM usuario 
+                      WHERE Id_usuario = @Id AND Estado = 1";
+
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+        using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Usuario
+                    {
+                        Id_usuario = reader.GetInt32(nameof(Usuario.Id_usuario)),
+                        Apellido = reader.GetString(nameof(Usuario.Apellido)),
+                        Nombre = reader.GetString(nameof(Usuario.Nombre)),
+                        Email = reader.GetString(nameof(Usuario.Email)),
+                        Clave = reader.GetString(nameof(Usuario.Clave)),
+                        Rol = reader.GetInt32(nameof(Usuario.Rol)),
+                        RolNombre = reader.GetString(nameof(Usuario.RolNombre)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Usuario.Estado)))
+                    };
+                }
+            }
+        }
+    }
+    return res;
+}
 }
