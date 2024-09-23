@@ -151,4 +151,76 @@ TempData["Mensaje"] = "Usuario Eliminado.";
  return RedirectToAction("Index");
 
 }
+public IActionResult Detalle(int id)
+{
+     if (id == 0)
+    {
+        TempData["Mensaje"] = "Usuario no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var usuario = repo.ObtenerPorID(id);
+        if (usuario == null){
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }
+        return View(usuario);
+    }
+}
+public IActionResult Edicion(int id)
+{
+      if (id == 0)
+    {
+        TempData["Mensaje"] = "Usuario no encontrado.";
+        return RedirectToAction("Index");
+    }
+    else
+    {
+        var usuario = repo.ObtenerPorID(id);
+        if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }
+        
+        return View(usuario);
+    }
+
+}
+public async Task<IActionResult> Actualizar(Usuario actualizarUsuario)
+{
+if (ModelState.IsValid)
+    {
+        //verificar si el email ya esta registrado
+    var e =  await repo.ObtenerPorEmailAsync(actualizarUsuario.Email);
+    if(e != null){
+        if(actualizarUsuario.Email == e.Email){
+            TempData["Mensaje"] = "Error al actualizar: EL email de ese usuario ya esta registrado.";
+            return RedirectToAction("Index");
+        }
+        }
+        //verificar rengo
+        if(actualizarUsuario.Rol == 1){
+            actualizarUsuario.RolNombre = "Administrador";
+        }else{
+            actualizarUsuario.RolNombre = "Empleado";
+        }
+        //verificar contraseña
+        var usuario = repo.ObtenerPorID(actualizarUsuario.Id_usuario);
+        if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }else{
+            var Clavein = actualizarUsuario.Clave;
+
+        }
+        repo.ActualizarUsuario(actualizarUsuario);
+        TempData["Mensaje"] = "Usuario Modificado correctamente.";
+        return RedirectToAction("Index");
+    }
+TempData["Mensaje"] = "Hubo un error al Modificar el Usuario.";
+return RedirectToAction("Index");
+}
 }

@@ -1,0 +1,40 @@
+@model Proyecto_Inmobiliaria_MVC.Models.Usuario
+@{
+    ViewData["Title"] = "Usuario Edicion";
+}
+<h1>Editar Usuario</h1>
+<form asp-action="Actualizar" method="post">
+    <div class="mb-3">
+        <label for="Nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="Nombre" name="Nombre" value="@Model.Nombre" />
+        <input type="hidden" class="form-control" id="Id_usuario" name="Id_usuario" value="@Model.Id_usuario" />
+    </div>
+    <div class="mb-3">
+        <label for="Apellido" class="form-label">Apellido</label>
+        <input type="text" class="form-control" id="Apellido" name="Apellido" value="@Model.Apellido" />
+    </div>
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <input type="text" class="form-control" id="Email" name="Email" value="@Model.Email" />
+    </div>
+    <div class="mb-3">
+        <label for="Rol" class="form-label">Rol</label>
+        @if(@Model.Rol == 1){
+        <select class="form-select" required aria-label="select example" id="Rol" name="Rol">
+        <option value="2">Empleado</option>
+        <option value="1" selected>Administrador</option>
+        </select>
+        }else{
+        <select class="form-select" required aria-label="select example" id="Rol" name="Rol">
+        <option value="2" selected>Empleado</option>
+        <option value="1">Administrador</option>
+        </select>
+        }
+    </div>
+    <div class="mb-3">
+        <label for="Clavein" class="form-label">Cambiar Clave</label>
+        <input type="password" class="form-control" id="Clavein" name="Clavein" value="" />
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+</form>
+ <a class="btn btn-info" asp-action="Index">Volver</a>

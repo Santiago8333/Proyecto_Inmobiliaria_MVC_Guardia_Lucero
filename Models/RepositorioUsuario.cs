@@ -147,4 +147,34 @@ public Usuario? ObtenerPorID(int id)
     }
     return res;
 }
+public void ActualizarUsuario(Usuario actualizarUsuario)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE usuario
+                    SET 
+                        {nameof(Usuario.Nombre)} = @Nombre, 
+                        {nameof(Usuario.Apellido)} = @Apellido, 
+                        {nameof(Usuario.Email)} = @Email, 
+                        {nameof(Usuario.Clave)} = @Clave, 
+                        {nameof(Usuario.Rol)} = @Rol, 
+                        {nameof(Usuario.RolNombre)} = @RolNombre
+                    WHERE Id_usuario = @Id AND Estado = true";
+         using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+
+            command.Parameters.AddWithValue("@Id", actualizarUsuario.Id_usuario);
+            command.Parameters.AddWithValue("@Nombre", actualizarUsuario.Nombre);
+            command.Parameters.AddWithValue("@Apellido", actualizarUsuario.Apellido);
+            command.Parameters.AddWithValue("@Email", actualizarUsuario.Email);
+            command.Parameters.AddWithValue("@Clave", actualizarUsuario.Clave);
+            command.Parameters.AddWithValue("@Rol", actualizarUsuario.Rol);
+            command.Parameters.AddWithValue("@RolNombre", actualizarUsuario.RolNombre);
+
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+    }
+}
 }
