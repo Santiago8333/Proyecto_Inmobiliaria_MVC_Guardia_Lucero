@@ -101,6 +101,7 @@ return View();
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Login", "Usuario");
     }
+[Authorize(Policy = "Administrador")]
 public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
 {
     //verificar si el email ya esta registrado
@@ -138,6 +139,7 @@ public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
     
     return RedirectToAction("Index");
 }
+[Authorize(Policy = "Administrador")]
 public IActionResult Eliminar(int id)
 {
     var usuario = repo.ObtenerPorID(id);
@@ -151,6 +153,7 @@ TempData["Mensaje"] = "Usuario Eliminado.";
  return RedirectToAction("Index");
 
 }
+[Authorize(Policy = "Administrador")]
 public IActionResult Detalle(int id)
 {
      if (id == 0)
@@ -168,6 +171,7 @@ public IActionResult Detalle(int id)
         return View(usuario);
     }
 }
+[Authorize(Policy = "Administrador")]
 public IActionResult Edicion(int id)
 {
       if (id == 0)
@@ -188,18 +192,11 @@ public IActionResult Edicion(int id)
     }
 
 }
+[Authorize(Policy = "Administrador")]
 public async Task<IActionResult> Actualizar(Usuario actualizarUsuario)
 {
 if (ModelState.IsValid)
     {
-        //verificar si el email ya esta registrado
-    var e =  await repo.ObtenerPorEmailAsync(actualizarUsuario.Email);
-    if(e != null){
-        if(actualizarUsuario.Email == e.Email){
-            TempData["Mensaje"] = "Error al actualizar: EL email de ese usuario ya esta registrado.";
-            return RedirectToAction("Index");
-        }
-        }
         //verificar rengo
         if(actualizarUsuario.Rol == 1){
             actualizarUsuario.RolNombre = "Administrador";
@@ -214,13 +211,70 @@ if (ModelState.IsValid)
             return RedirectToAction("Index");
         }else{
             var Clavein = actualizarUsuario.Clave;
-
+            if(Clavein != usuario.Clave){
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: Clavein,
+                salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]), 
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 1000,
+                numBytesRequested: 256 / 8));
+            actualizarUsuario.Clave = hashed;
+            }else{
+                actualizarUsuario.Clave = usuario.Clave;
+            }
         }
+    //verificar si el email ya esta registrado
+    if(usuario.Email == actualizarUsuario.Email){
+    
+    }else{
+        var e =  await repo.ObtenerPorEmailAsync(actualizarUsuario.Email);
+    if(e != null){
+        if(actualizarUsuario.Email == e.Email){
+            TempData["Mensaje"] = "Error al actualizar: EL email de ese usuario ya esta registrado.";
+            return RedirectToAction("Index");
+        }
+        }
+    }
         repo.ActualizarUsuario(actualizarUsuario);
+        
+        if(usuario.Email == @User.Identity.Name){
+            await ActualizarClaimsYReautenticar(actualizarUsuario);
+            //Console.WriteLine("ClaimTypes.Name IN: "+@User.Identity.Name);
+        }
+        
         TempData["Mensaje"] = "Usuario Modificado correctamente.";
         return RedirectToAction("Index");
     }
 TempData["Mensaje"] = "Hubo un error al Modificar el Usuario.";
 return RedirectToAction("Index");
+}
+
+private async Task ActualizarClaimsYReautenticar(Usuario usuarioActualizado)
+{
+    // Crear una lista de claims actualizada
+    var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, usuarioActualizado.Email),  // O el nuevo nombre de usuario
+        new Claim(ClaimTypes.Role, usuarioActualizado.RolNombre) // El rol actualizado
+        // Puedes añadir más claims si es necesario
+    };
+
+    // Crear una nueva identidad de usuario con las claims actualizadas
+    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+    // Crear un nuevo principal
+    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+    // Re-autenticar al usuario actualizando su cookie de autenticación
+    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+}
+
+
+[Authorize]
+public IActionResult Perfil()
+{
+return View();
+
 }
 }

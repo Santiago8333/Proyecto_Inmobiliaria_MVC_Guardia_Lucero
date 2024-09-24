@@ -34,7 +34,23 @@
     <div class="mb-3">
         <label for="Clavein" class="form-label">Cambiar Clave</label>
         <input type="password" class="form-control" id="Clavein" name="Clavein" value="" />
+        <input type="hidden" class="form-control" id="Clave" name="Clave" value="@Model.Clave" />
     </div>
     <button type="submit" class="btn btn-primary">Actualizar</button>
 </form>
  <a class="btn btn-info" asp-action="Index">Volver</a>
+ <script>
+    const Clave = document.getElementById('Clave');
+    const Claveper = Clave.value;
+    document.getElementById('Clavein').addEventListener('input', function() {
+        var input = this;
+        
+    if(!input.value) {
+        console.log("El input está vacío, asignando valor por defecto: " + Claveper);
+        Clave.value = Claveper;  
+    } else {
+        Clave.value = input.value;  
+        console.log("Valor ingresado: " + input.value);
+    }
+    });
+</script>
