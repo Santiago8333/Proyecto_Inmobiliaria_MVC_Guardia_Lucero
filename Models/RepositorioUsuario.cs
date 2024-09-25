@@ -177,4 +177,49 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         }
     }
 }
+public void ActualizarUsuarioPerfil(Usuario actualizarUsuario)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE usuario
+                    SET 
+                        {nameof(Usuario.Nombre)} = @Nombre, 
+                        {nameof(Usuario.Apellido)} = @Apellido, 
+                        {nameof(Usuario.Email)} = @Email
+                    WHERE Id_usuario = @Id AND Estado = true";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+
+            command.Parameters.AddWithValue("@Id", actualizarUsuario.Id_usuario);
+            command.Parameters.AddWithValue("@Nombre", actualizarUsuario.Nombre);
+            command.Parameters.AddWithValue("@Apellido", actualizarUsuario.Apellido);
+            command.Parameters.AddWithValue("@Email", actualizarUsuario.Email);
+
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+    }
+}
+
+public void ActualizarUsuarioClave(Usuario actualizarUsuario)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE usuario
+                    SET 
+                        {nameof(Usuario.Clave)} = @Clave
+                    WHERE Id_usuario = @Id AND Estado = true";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+
+            command.Parameters.AddWithValue("@Id", actualizarUsuario.Id_usuario);
+            command.Parameters.AddWithValue("@Clave", actualizarUsuario.Clave);
+
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+    }
+}
 }

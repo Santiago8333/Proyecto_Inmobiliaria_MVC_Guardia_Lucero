@@ -3,3 +3,72 @@
     ViewData["Title"] = "Usuario Perfil";
 }
 <h1>Perfil</h1>
+<form asp-action="ActualizarPerfil" method="post">
+    <div class="mb-3">
+        <label for="Nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="Nombre" name="Nombre" value="@Model.Nombre" />
+        <input type="hidden" class="form-control" id="Id_usuario" name="Id_usuario" value="@Model.Id_usuario" />
+    </div>
+    <div class="mb-3">
+        <label for="Apellido" class="form-label">Apellido</label>
+        <input type="text" class="form-control" id="Apellido" name="Apellido" value="@Model.Apellido" />
+    </div>
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <input type="text" class="form-control" id="Email" name="Email" value="@Model.Email" />
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+</form>
+<h1>Actualizar Clave</h1>
+<form asp-action="ActualizarClave" method="post">
+    <div class="mb-3">
+        <label for="ClaveAntigua" class="form-label">Clave Antigua</label>
+        <input type="text" class="form-control" id="ClaveAntigua" name="ClaveAntigua" value="" />
+        <input type="hidden" class="form-control" id="Id_usuario" name="Id_usuario" value="@Model.Id_usuario" />
+    </div>
+    <div class="mb-3">
+        <label for="Clavein" class="form-label">Clave Nueva</label>
+        <input type="password" class="form-control" id="Clavein" name="Clavein" value="" />
+        <input type="hidden" class="form-control" id="Clave" name="Clave" value="@Model.Clave" />
+    </div>
+<button type="submit" class="btn btn-primary">Actualizar</button>
+</form>
+<!--toats sietama-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Sistema</strong>
+      <small class="text-muted">justo ahora</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+    <div class="toast-body">
+      @TempData["Mensaje"]
+    </div>
+  </div>
+</div>
+ <script>
+    const Clave = document.getElementById('Clave');
+    const Claveper = Clave.value;
+    document.getElementById('Clavein').addEventListener('input', function() {
+        var input = this;
+        
+    if(!input.value) {
+        console.log("El input está vacío, asignando valor por defecto: " + Claveper);
+        Clave.value = Claveper;  
+    } else {
+        Clave.value = input.value;  
+        console.log("Valor ingresado: " + input.value);
+    }
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElement = document.getElementById("successToast");
+        var toast = new bootstrap.Toast(toastElement);
+        
+        @if (TempData["Mensaje"] != null)
+        {
+            <text>
+                toast.show();
+            </text>
+        }
+    });
+</script>

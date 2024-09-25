@@ -249,6 +249,96 @@ TempData["Mensaje"] = "Hubo un error al Modificar el Usuario.";
 return RedirectToAction("Index");
 }
 
+
+[Authorize]
+public async Task<IActionResult> Perfil()
+{
+    var usuario = await repo.ObtenerPorEmailAsync(@User.Identity.Name);
+    return View(usuario);
+}
+public async Task<IActionResult> ActualizarPerfil(Usuario actualizarUsuario)
+{
+if (ModelState.IsValid)
+    {
+        //verificar si hay usuario
+        var usuario = repo.ObtenerPorID(actualizarUsuario.Id_usuario);
+        if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }
+        //verificar si el email ya esta registrado
+    if(usuario.Email == actualizarUsuario.Email){
+    
+    }else{
+        var e =  await repo.ObtenerPorEmailAsync(actualizarUsuario.Email);
+    if(e != null){
+        if(actualizarUsuario.Email == e.Email){
+            TempData["Mensaje"] = "Error al actualizar: EL email de ese usuario ya esta en uso.";
+            return RedirectToAction("Perfil");
+        }
+        }
+    }
+    
+        repo.ActualizarUsuarioPerfil(actualizarUsuario);
+        
+        if(usuario.Email == @User.Identity.Name){
+            actualizarUsuario.RolNombre = usuario.RolNombre;
+            await ActualizarClaimsYReautenticar(actualizarUsuario);
+            //Console.WriteLine("ClaimTypes.Name IN: "+@User.Identity.Name);
+        }
+        TempData["Mensaje"] = "Perfil Modificado correctamente.";
+        return RedirectToAction("Perfil");
+    }
+    
+TempData["Mensaje"] = "Hubo un error al Actualizar Perfil el Usuario.";
+return RedirectToAction("Index");
+}
+public IActionResult ActualizarClave(Usuario actualizarUsuario)
+{
+    if (ModelState.IsValid)
+    {
+//verificar contraseña
+        var usuario = repo.ObtenerPorID(actualizarUsuario.Id_usuario);
+        if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }else{
+            var Clavein = actualizarUsuario.Clave;
+            if(Clavein != usuario.Clave){
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: Clavein,
+                salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]), 
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 1000,
+                numBytesRequested: 256 / 8));
+            actualizarUsuario.Clave = hashed;
+            }else{
+                actualizarUsuario.Clave = usuario.Clave;
+            }
+            //verificar la contraseña vieja 
+            string hashed2 = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: actualizarUsuario.ClaveAntigua,
+                salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]), 
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 1000,
+                numBytesRequested: 256 / 8));
+            actualizarUsuario.ClaveAntigua = hashed2;
+            if(usuario.Clave != actualizarUsuario.ClaveAntigua){
+                TempData["Mensaje"] = "Error: la clave antigua es incorrecta.";
+                return RedirectToAction("Perfil");
+            }
+
+        }
+        repo.ActualizarUsuarioClave(actualizarUsuario);
+        TempData["Mensaje"] = "Clave Modificada correctamente.";
+        return RedirectToAction("Perfil");
+    }
+TempData["Mensaje"] = "Hubo un error al Actualizar la Clave del Usuario.";
+return RedirectToAction("Perfil");
+}
+//actualizar claim 
 private async Task ActualizarClaimsYReautenticar(Usuario usuarioActualizado)
 {
     // Crear una lista de claims actualizada
@@ -270,11 +360,4 @@ private async Task ActualizarClaimsYReautenticar(Usuario usuarioActualizado)
     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 }
 
-
-[Authorize]
-public IActionResult Perfil()
-{
-return View();
-
-}
 }
