@@ -303,7 +303,7 @@ if (ModelState.IsValid)
     if(e != null){
         if(actualizarUsuario.Email == e.Email){
             TempData["Mensaje"] = "Error al actualizar: EL email de ese usuario ya esta registrado.";
-            return RedirectToAction("Index");
+            return RedirectToAction("Edicion", new { id = usuario.Id_usuario });
         }
         }
     }
@@ -315,7 +315,7 @@ if (ModelState.IsValid)
         }
         
         TempData["Mensaje"] = "Usuario Modificado correctamente.";
-        return RedirectToAction("Index");
+        return RedirectToAction("Edicion", new { id = usuario.Id_usuario });
     }
 TempData["Mensaje"] = "Hubo un error al Modificar el Usuario.";
 return RedirectToAction("Index");
@@ -409,6 +409,132 @@ public IActionResult ActualizarClave(Usuario actualizarUsuario)
         return RedirectToAction("Perfil");
     }
 TempData["Mensaje"] = "Hubo un error al Actualizar la Clave del Usuario.";
+return RedirectToAction("Perfil");
+}
+//actualizar avatar
+[Authorize(Policy = "Administrador")]
+public async Task<IActionResult> ActualizarAvatar(Usuario actualizarUsuario,IFormFile AvatarFile)
+{
+    ModelState.Remove("AvatarFile");
+    if (ModelState.IsValid)
+    {
+         var usuario = repo.ObtenerPorID(actualizarUsuario.Id_usuario);
+        if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }else{
+// Verificar si se subió un archivo de avatar
+        if (AvatarFile != null && AvatarFile.Length > 0)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(AvatarFile.FileName);
+            var extension = Path.GetExtension(AvatarFile.FileName);
+            var newFileName = $"{Guid.NewGuid()}{extension}";
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars", newFileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await AvatarFile.CopyToAsync(stream);
+            }
+
+            Console.WriteLine("Archivo cargado: " + fileName);
+            actualizarUsuario.AvatarUrl = $"/avatars/{newFileName}";
+        }
+        else
+        {
+            Console.WriteLine("No se subió un archivo de avatar.");
+            actualizarUsuario.AvatarUrl = "/avatars/default-avatar.png";  // Asignar avatar por defecto
+        }
+// Verificar si tiene una imagen personalizada y no es la imagen por defecto
+    if (!string.IsNullOrEmpty(usuario.AvatarUrl) && usuario.AvatarUrl != "/avatars/default-avatar.png")
+    {
+        
+        var avatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", usuario.AvatarUrl.TrimStart('/'));
+
+        if (System.IO.File.Exists(avatarPath))
+        {
+            try
+            {
+                // Eliminar la imagen del servidor
+                System.IO.File.Delete(avatarPath);
+                Console.WriteLine("Imagen eliminada: " + avatarPath);
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores si la imagen no se puede eliminar
+                Console.WriteLine("Error al eliminar la imagen: " + ex.Message);
+            }
+        }
+    }
+        }
+        TempData["Mensaje"] = "Avatar actualizado.";
+        repo.ActualizarAvatar(actualizarUsuario);
+        return RedirectToAction("index");
+    }
+TempData["Mensaje"] = "Hubo un error al Actualizar El avatar del Usuario.";
+return RedirectToAction("index");
+}
+//actualizar avatar usuario
+[Authorize]
+public async Task<IActionResult> ActualizarUsuarioAvatar(Usuario actualizarUsuario,IFormFile AvatarFile)
+{
+ModelState.Remove("AvatarFile");
+if (ModelState.IsValid)
+    {
+         var usuario = repo.ObtenerPorID(actualizarUsuario.Id_usuario);
+        if (usuario == null)
+        {
+            TempData["Mensaje"] = "Usuario no encontrado.";
+            return RedirectToAction("Index");
+        }else{
+// Verificar si se subió un archivo de avatar
+        if (AvatarFile != null && AvatarFile.Length > 0)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(AvatarFile.FileName);
+            var extension = Path.GetExtension(AvatarFile.FileName);
+            var newFileName = $"{Guid.NewGuid()}{extension}";
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars", newFileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await AvatarFile.CopyToAsync(stream);
+            }
+
+            Console.WriteLine("Archivo cargado: " + fileName);
+            actualizarUsuario.AvatarUrl = $"/avatars/{newFileName}";
+        }
+        else
+        {
+            Console.WriteLine("No se subió un archivo de avatar.");
+            actualizarUsuario.AvatarUrl = "/avatars/default-avatar.png";  // Asignar avatar por defecto
+        }
+// Verificar si tiene una imagen personalizada y no es la imagen por defecto
+    if (!string.IsNullOrEmpty(usuario.AvatarUrl) && usuario.AvatarUrl != "/avatars/default-avatar.png")
+    {
+        
+        var avatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", usuario.AvatarUrl.TrimStart('/'));
+
+        if (System.IO.File.Exists(avatarPath))
+        {
+            try
+            {
+                // Eliminar la imagen del servidor
+                System.IO.File.Delete(avatarPath);
+                Console.WriteLine("Imagen eliminada: " + avatarPath);
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores si la imagen no se puede eliminar
+                Console.WriteLine("Error al eliminar la imagen: " + ex.Message);
+            }
+        }
+    }
+        }
+        TempData["Mensaje"] = "Avatar actualizado.";
+        repo.ActualizarAvatar(actualizarUsuario);
+        return RedirectToAction("Perfil");
+    }
+TempData["Mensaje"] = "Hubo un error al Actualizar El avatar del Usuario.";
 return RedirectToAction("Perfil");
 }
 //actualizar claim 

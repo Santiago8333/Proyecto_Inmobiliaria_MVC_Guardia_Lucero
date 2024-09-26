@@ -33,6 +33,16 @@
     </div>
 <button type="submit" class="btn btn-primary">Actualizar</button>
 </form>
+<h1>Actualizar Avatar</h1>
+<form asp-action="ActualizarUsuarioAvatar" method="post" enctype="multipart/form-data">
+<div class="mb-3">
+    <img src="@Model.AvatarUrl" class="rounded-circle" alt="avatar" style="width: 40px; height: 40px;">
+    <label for="AvatarFile">Avatar</label>
+    <input name="AvatarFile" type="file" />
+    <input type="hidden" class="form-control" id="Id_usuario" name="Id_usuario" value="@Model.Id_usuario" />
+</div>
+<button type="submit" class="btn btn-primary">Actualizar</button>
+</form>
 <!--toats sietama-->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">

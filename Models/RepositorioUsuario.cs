@@ -225,4 +225,25 @@ public void ActualizarUsuarioClave(Usuario actualizarUsuario)
         }
     }
 }
+public void ActualizarAvatar(Usuario actualizarUsuario)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE usuario
+                    SET 
+                        {nameof(Usuario.AvatarUrl)} = @AvatarUrl
+                    WHERE Id_usuario = @Id AND Estado = true";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+
+            command.Parameters.AddWithValue("@Id", actualizarUsuario.Id_usuario);
+            command.Parameters.AddWithValue("@AvatarUrl", actualizarUsuario.AvatarUrl);
+
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+    }
+
+}
 }
