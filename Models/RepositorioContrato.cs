@@ -135,7 +135,7 @@ public void AgregarContrato(Contrato nuevoContrato)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.Estado)},{nameof(Contrato.Monto_Pagar)})
+        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.Monto_Pagar)},{nameof(Contrato.Estado)})
                     VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Fecha_desde,@Fecha_hasta,@Monto_Pagar, @Estado)";
         using(MySqlCommand command = new MySqlCommand(query, connection))
         {
@@ -144,7 +144,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Monto", nuevoContrato.Monto);
             command.Parameters.AddWithValue("@Fecha_desde", nuevoContrato.Fecha_desde);
             command.Parameters.AddWithValue("@Fecha_hasta", nuevoContrato.Fecha_hasta);
-            command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto);
+            command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto_Pagar);
             command.Parameters.AddWithValue("@Estado", true);
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
@@ -337,5 +337,46 @@ public void ActualizarPago(Pago actualizarPago)
             connection.Close();
         }
     }
+}
+public Contrato? ObtenerContratoPorFecha(int id, DateTime FechaDesde, DateTime FechaHasta)
+{
+    Contrato? res = null;
+    
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT * 
+                      FROM contrato 
+                      WHERE Id_inmueble = @Id
+                      AND Estado = 1
+                      AND ((Fecha_desde <= @Fecha_hasta AND Fecha_hasta >= @Fecha_desde));";
+
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agregar parámetros
+            command.Parameters.AddWithValue("@Id", id);
+            command.Parameters.AddWithValue("@Fecha_desde", FechaDesde);
+            command.Parameters.AddWithValue("@Fecha_hasta", FechaHasta);
+
+            connection.Open();
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Contrato
+                    {
+                        Id_contrato = reader.GetInt32(nameof(Contrato.Id_contrato)),
+                        Fecha_desde = reader.GetDateTime(nameof(Contrato.Fecha_desde)),
+                        Fecha_hasta = reader.GetDateTime(nameof(Contrato.Fecha_hasta)),
+                        Monto = reader.GetInt32(nameof(Contrato.Monto)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado)))
+                        // Agrega más propiedades si es necesario
+                    };
+                }
+            }
+        }
+    }
+
+    return res;
 }
 }

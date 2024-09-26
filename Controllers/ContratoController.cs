@@ -68,10 +68,19 @@ public IActionResult Agregar(Contrato nuevoContrato)
 {
         if (ModelState.IsValid)
     {
-        
-        repo.AgregarContrato(nuevoContrato);
+        //verificar si hay un contrato ya en ese rango de fecha
+        var contrato = repo.ObtenerContratoPorFecha(nuevoContrato.Id_inmueble,nuevoContrato.Fecha_desde,nuevoContrato.Fecha_hasta);
+        if(contrato == null){
+            nuevoContrato.Monto_Pagar = nuevoContrato.Monto;
+            repo.AgregarContrato(nuevoContrato);
         TempData["Mensaje"] = "Contrato agregado exitosamente.";
         return RedirectToAction("Index");
+        }else{
+
+            TempData["Mensaje"] = "Contrato ya exsiste un contrato en ese rango de fechas.";
+        return RedirectToAction("Index");
+        }
+        
     }
 
     TempData["Mensaje"] = "Hubo un error al agregar el Contrato.";
