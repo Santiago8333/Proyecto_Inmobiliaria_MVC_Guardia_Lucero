@@ -52,7 +52,21 @@ return View();
     [HttpPost]
     public async Task<IActionResult> Login(Usuario loginusuario)
     {
-        
+        Console.WriteLine("Login: "+loginusuario.Email);
+        Console.WriteLine("Login: "+loginusuario.Clave);
+        if (!ModelState.IsValid)
+{
+    Console.WriteLine("El modelo no es válido");
+    foreach (var modelState in ModelState.Values)
+    {
+        foreach (var error in modelState.Errors)
+        {
+            Console.WriteLine(error.ErrorMessage);
+        }
+    }
+    TempData["Mensaje"] = "Error de credenciales";
+    return View();
+}
         if (ModelState.IsValid)
         {
             
@@ -75,12 +89,14 @@ return View();
                     TempData["MensajeTipo"] = "danger";
 					return RedirectToAction("Login");
 				}
-            Console.WriteLine("Clave de la cuenta: " + e.Clave);
+           
+            //Console.WriteLine("Clave de la cuenta: " + e.Clave);
             //Console.WriteLine("Clave ingresada: " + loginusuario.Clave);
             var claims = new List<Claim>
 				{
 					new Claim(ClaimTypes.Name, e.Email),
 					new Claim("FullName", e.Nombre + " " + e.Apellido),
+                    new Claim("AvatarUrl", e.AvatarUrl),
 					new Claim(ClaimTypes.Role, e.RolNombre),
 				};
             var claimsIdentity = new ClaimsIdentity(
@@ -102,7 +118,7 @@ return View();
         return RedirectToAction("Login", "Usuario");
     }
 [Authorize(Policy = "Administrador")]
-public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
+public async Task<IActionResult> Agregar(Usuario nuevoUsuario,IFormFile AvatarFile)
 {
     //verificar si el email ya esta registrado
     var e = await repo.ObtenerPorEmailAsync(nuevoUsuario.Email);
@@ -112,7 +128,19 @@ public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
         return RedirectToAction("Index");
     }
     }
-    //Console.WriteLine("afuera: " + nuevoUsuario);
+    
+if (!ModelState.IsValid)
+{
+    Console.WriteLine("El modelo no es válido");
+    foreach (var modelState in ModelState.Values)
+    {
+        foreach (var error in modelState.Errors)
+        {
+            Console.WriteLine(error.ErrorMessage);
+        }
+    }
+}
+ ModelState.Remove("AvatarFile");
     if (ModelState.IsValid)
     {
         //Console.WriteLine("dentro: " + nuevoUsuario);
@@ -128,6 +156,27 @@ public async Task<IActionResult> Agregar(Usuario nuevoUsuario)
             nuevoUsuario.RolNombre = "Administrador";
         }else{
             nuevoUsuario.RolNombre = "Empleado";
+        }
+// Verificar si se subió un archivo de avatar
+        if (AvatarFile != null && AvatarFile.Length > 0)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(AvatarFile.FileName);
+            var extension = Path.GetExtension(AvatarFile.FileName);
+            var newFileName = $"{Guid.NewGuid()}{extension}";
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars", newFileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await AvatarFile.CopyToAsync(stream);
+            }
+
+            Console.WriteLine("Archivo cargado: " + fileName);
+            nuevoUsuario.AvatarUrl = $"/avatars/{newFileName}";
+        }
+        else
+        {
+            Console.WriteLine("No se subió un archivo de avatar.");
+            nuevoUsuario.AvatarUrl = "/avatars/default-avatar.png";  // Asignar avatar por defecto
         }
 
         repo.AgregarUsuario(nuevoUsuario);
@@ -148,9 +197,32 @@ public IActionResult Eliminar(int id)
             TempData["Mensaje"] = "Usuario no encontrado.";
             return RedirectToAction("Index");
         }
-        repo.EliminarUsuario(id);
+    // Verificar si tiene una imagen personalizada y no es la imagen por defecto
+    if (!string.IsNullOrEmpty(usuario.AvatarUrl) && usuario.AvatarUrl != "/avatars/default-avatar.png")
+    {
+        
+        var avatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", usuario.AvatarUrl.TrimStart('/'));
+
+        if (System.IO.File.Exists(avatarPath))
+        {
+            try
+            {
+                // Eliminar la imagen del servidor
+                System.IO.File.Delete(avatarPath);
+                Console.WriteLine("Imagen eliminada: " + avatarPath);
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores si la imagen no se puede eliminar
+                Console.WriteLine("Error al eliminar la imagen: " + ex.Message);
+            }
+        }
+    }
+
+
+repo.EliminarUsuario(id);
 TempData["Mensaje"] = "Usuario Eliminado.";
- return RedirectToAction("Index");
+return RedirectToAction("Index");
 
 }
 [Authorize(Policy = "Administrador")]
@@ -294,6 +366,7 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "Hubo un error al Actualizar Perfil el Usuario.";
 return RedirectToAction("Index");
 }
+[Authorize]
 public IActionResult ActualizarClave(Usuario actualizarUsuario)
 {
     if (ModelState.IsValid)
@@ -344,7 +417,8 @@ private async Task ActualizarClaimsYReautenticar(Usuario usuarioActualizado)
     // Crear una lista de claims actualizada
     var claims = new List<Claim>
     {
-        new Claim(ClaimTypes.Name, usuarioActualizado.Email),  // O el nuevo nombre de usuario
+        new Claim(ClaimTypes.Name, usuarioActualizado.Email),
+        new Claim("FullName", usuarioActualizado.Nombre + " " + usuarioActualizado.Apellido),
         new Claim(ClaimTypes.Role, usuarioActualizado.RolNombre) // El rol actualizado
         // Puedes añadir más claims si es necesario
     };

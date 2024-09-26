@@ -70,7 +70,8 @@
                 }else{
                     <span class="me-2">Rango: Empleado</span>
                 }
-                <img src="~/images/avatar.png" class="rounded-circle" alt="avatar" style="width: 40px; height: 40px;">
+          
+                <img src="@User.FindFirst("AvatarUrl")?.Value" class="rounded-circle" alt="avatar" style="width: 40px; height: 40px;">
                 <a class="nav-link text-dark" asp-area="" asp-controller="Usuario" asp-action="Logout">Salir</a>
             </div>
             }

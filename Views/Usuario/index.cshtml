@@ -5,6 +5,10 @@
 }
 <div class="text-center">
 	<h1 class="display-4">Lista de Usuarios</h1>
+  <div class="col-md-12">
+          <label for="Buscar" class="form-label">Buscar por email</label>
+          <input type="text" class="form-control" id="Buscar" name="Buscar" placeholder="Buscar por Email">
+  </div>
 </div>
 <table class="table table-striped table-hover">
   <thead>
@@ -13,7 +17,7 @@
         <th>Apellido</th>
         <th>Email</th>
         <th>Rol</th>
-        <th>Estado</th>
+        <th>Avatar</th>
         <th>Acciones</th>
     </tr>
   </thead>
@@ -30,13 +34,11 @@
                 <td>
 					@Html.DisplayFor(modelItem => item.Email)
 				</td>
-                <td>
+          <td>
 					@Html.DisplayFor(modelItem => item.RolNombre)
 				</td>
-                <td>
-                    <div class="form-check form-switch">
-                        @Html.CheckBoxFor(modelItem => item.Estado, new { @class = "form-check-input", role = "switch", id = "flexSwitchCheckDisabled", @disabled = "disabled" })
-                    </div>
+         <td>
+          <img src="@Html.DisplayFor(modelItem => item.AvatarUrl)" class="rounded-circle" alt="avatar" style="width: 40px; height: 40px;">
 				</td>
                 <td>
                   <a href="@Url.Action("Detalle", "Usuario", new { id = item.Id_usuario }) " class="btn btn-info">
@@ -70,7 +72,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-    <form asp-action="Agregar" method="post">
+    <form asp-action="Agregar" method="post" enctype="multipart/form-data">
         <div class="col-md-12">
             <h1>Register</h1>
         </div>
@@ -91,8 +93,8 @@
             <input type="password" class="form-control" id="Password" name="Clave" required>
         </div>
         <div class="col-md-12">
-            <label for="Avatar" class="form-label">Avatar</label>
-            <input type="file" class="form-control" id="Avatar" name="AvatarImage" >
+            <label for="AvatarFile">Avatar (opcional)</label>
+            <input name="AvatarFile" type="file" />
         </div>
         <div class="col-md-12">
             <label for="Rol" class="form-label">Rol</label>

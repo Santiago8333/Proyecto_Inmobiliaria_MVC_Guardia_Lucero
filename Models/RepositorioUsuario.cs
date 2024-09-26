@@ -11,8 +11,8 @@ public class RepositorioUsuario
 		List<Usuario> usuarios = new List<Usuario>();
         using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
-            var query = $@"SELECT {nameof(Usuario.Id_usuario)}, {nameof(Usuario.Nombre)}, {nameof(Usuario.Apellido)}, {nameof(Usuario.Email)}, {nameof(Usuario.RolNombre)}, {nameof(Usuario.Estado)}
-                      FROM usuario";
+            var query = $@"SELECT {nameof(Usuario.Id_usuario)}, {nameof(Usuario.Nombre)}, {nameof(Usuario.Apellido)}, {nameof(Usuario.Email)}, {nameof(Usuario.RolNombre)}, {nameof(Usuario.Estado)},{nameof(Usuario.AvatarUrl)}
+                      FROM usuario WHERE Estado = true";
 
         using(MySqlCommand command = new MySqlCommand(query, connection))
 			{
@@ -27,6 +27,7 @@ public class RepositorioUsuario
                     Apellido = reader.GetString(nameof(Usuario.Apellido)),
                     Email = reader.GetString(nameof(Usuario.Email)),
                     RolNombre = reader.GetString(nameof(Usuario.RolNombre)),
+                    AvatarUrl = reader.GetString(nameof(Usuario.AvatarUrl)),
                     Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Usuario.Estado)))
 					});
 				}
@@ -41,7 +42,7 @@ public async Task<Usuario?> ObtenerPorEmailAsync(string email)
 
     using (var connection = new MySqlConnection(ConectionString))
     {
-        var query = @"SELECT Id_usuario, Nombre, Apellido, Email, RolNombre, Clave
+        var query = @"SELECT Id_usuario, Nombre, Apellido, Email, RolNombre, Clave , AvatarUrl
                       FROM usuario
                       WHERE Email = @Email AND Estado = true";
 
@@ -63,7 +64,8 @@ public async Task<Usuario?> ObtenerPorEmailAsync(string email)
                         Apellido = reader.GetString(reader.GetOrdinal("Apellido")),
                         Email = reader.GetString(reader.GetOrdinal("Email")),
                         RolNombre = reader.GetString(reader.GetOrdinal("RolNombre")),
-                        Clave = reader.GetString(reader.GetOrdinal("Clave")) 
+                        Clave = reader.GetString(reader.GetOrdinal("Clave")),
+                        AvatarUrl = reader.GetString(reader.GetOrdinal("AvatarUrl"))
                     };
                 }
             }
@@ -76,8 +78,8 @@ public void AgregarUsuario(Usuario nuevoUsuario)
 {
      using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"INSERT INTO usuario ({nameof(Usuario.Nombre)}, {nameof(Usuario.Apellido)}, {nameof(Usuario.Email)}, {nameof(Usuario.Clave)}, {nameof(Usuario.Rol)}, {nameof(Usuario.RolNombre)},{nameof(Usuario.Estado)})
-                    VALUES (@Nombre, @Apellido, @Email,@Clave,@Rol, @RolNombre, @Estado)";
+        var query = $@"INSERT INTO usuario ({nameof(Usuario.Nombre)}, {nameof(Usuario.Apellido)}, {nameof(Usuario.Email)}, {nameof(Usuario.Clave)}, {nameof(Usuario.Rol)}, {nameof(Usuario.RolNombre)},{nameof(Usuario.Estado)},{nameof(Usuario.AvatarUrl)})
+                    VALUES (@Nombre, @Apellido, @Email,@Clave,@Rol, @RolNombre, @Estado,@AvatarFile)";
          using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             
@@ -87,6 +89,7 @@ public void AgregarUsuario(Usuario nuevoUsuario)
             command.Parameters.AddWithValue("@Clave", nuevoUsuario.Clave);
             command.Parameters.AddWithValue("@Rol", nuevoUsuario.Rol);
             command.Parameters.AddWithValue("@RolNombre", nuevoUsuario.RolNombre);
+            command.Parameters.AddWithValue("@AvatarFile",nuevoUsuario.AvatarUrl);
             command.Parameters.AddWithValue("@Estado", true); 
 
             connection.Open();
@@ -99,8 +102,7 @@ public void EliminarUsuario(int id)
 {
 using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"UPDATE usuario 
-                       SET {nameof(Usuario.Estado)} = @Estado
+        var query = $@"DELETE FROM usuario 
                        WHERE Id_usuario = @Id AND Estado = 1";
         using(MySqlCommand command = new MySqlCommand(query, connection))
         {
@@ -117,7 +119,7 @@ public Usuario? ObtenerPorID(int id)
     Usuario? res = null;
     using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = @"SELECT Id_usuario,Apellido, Nombre, Email, Clave,AvatarFile,Rol,RolNombre,Estado
+        var query = @"SELECT Id_usuario,Apellido, Nombre, Email, Clave,AvatarUrl,Rol,RolNombre,Estado
                       FROM usuario 
                       WHERE Id_usuario = @Id AND Estado = 1";
 
@@ -139,6 +141,7 @@ public Usuario? ObtenerPorID(int id)
                         Clave = reader.GetString(nameof(Usuario.Clave)),
                         Rol = reader.GetInt32(nameof(Usuario.Rol)),
                         RolNombre = reader.GetString(nameof(Usuario.RolNombre)),
+                        AvatarUrl = reader.GetString(nameof(Usuario.AvatarUrl)),
                         Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Usuario.Estado)))
                     };
                 }
