@@ -1,0 +1,143 @@
+@model InmueblesPropietariosViewModel
+@{
+    ViewData["Title"] = "Inmuebles";
+}
+<div class="text-center">
+    <h1 class="display-4">Lista de Inmuebles Suspendidos</h1>
+</div>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+        <th>Uso</th>
+        <th>Tipo</th>
+        <th>Ambiente</th>
+        <th>Precio</th>
+        <th>Nombre Propietario</th>
+        <th>Email Propietario</th>
+        <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
+{
+    @foreach (var item in Model.InmueblesPaginados)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Uso)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tipo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ambiente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Precio)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NombrePropietario)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailPropietario)
+            </td>
+            <td>
+                <a href="javascript:void(0);" 
+                   data-id="@item.Id_inmueble" 
+                   class="btn btn-success" 
+                   onclick="confirmActivar(this)">
+                     <i class="fa-solid fa-check"></i>
+                </a>
+            </td>
+        </tr>
+    }
+    }
+</tbody>
+</table>
+<!-- Modal Activar-->
+<div class="modal fade" id="confirmActivarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmar Activacion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas Activar este Inmueble?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="confirmActivarButton" href="#" class="btn btn-success">Activar</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Paginación -->
+<nav aria-label="Navegación de página">
+    <ul class="pagination justify-content-center">
+        @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
+                    {
+        @if (Model.InmueblesPaginados.PaginasAnteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.InmueblesPaginados.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Anterior</span>
+            </li>
+        }
+
+        @for (int i = 1; i <= Model.InmueblesPaginados.PaginasTotales; i++)
+        {
+            <li class="page-item @(i == Model.InmueblesPaginados.PaginaInicio ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
+            </li>
+        }
+
+        @if (Model.InmueblesPaginados.PaginasPosteriores)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.InmueblesPaginados.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Siguiente</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Siguiente</span>
+            </li>
+        }
+        }
+    </ul>
+</nav>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElement = document.getElementById("successToast");
+        var toast = new bootstrap.Toast(toastElement);
+        
+        @if (TempData["Mensaje"] != null)
+        {
+            <text>
+                toast.show();
+            </text>
+        }
+    });
+    //suspender Inmueble
+        function confirmActivar(element) {
+        var id = element.getAttribute("data-id");
+        var url = "@Url.Action("Activar", "Inmuebles")" + "/" + id;
+        document.getElementById("confirmActivarButton").setAttribute("href", url);
+        var myModal = new bootstrap.Modal(document.getElementById('confirmActivarModal'));
+        myModal.show();
+    }
+</script>

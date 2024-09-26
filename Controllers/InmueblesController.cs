@@ -30,6 +30,20 @@ public class InmueblesController : Controller
 
         return View(viewModel);
     }
+ public async Task<IActionResult> Suspendidos(int pageNumber = 1, int pageSize = 5)
+    {
+        var inmueblesQueryable = repo.ObtenerTodosDesactivados().AsQueryable();
+        var paginacion = await Paginacion<Inmuebles>.CrearPaginacion(inmueblesQueryable, pageNumber, pageSize);
+        var propietarios = repo2.ObtenerTodos();
+
+        var viewModel = new InmueblesPropietariosViewModel
+        {
+            InmueblesPaginados = paginacion,
+            Propietarios = propietarios
+        };
+
+        return View(viewModel);
+    }
 [HttpPost]
 public IActionResult Agregar(Inmuebles nuevoInmuebles)
 {
@@ -42,7 +56,7 @@ if (ModelState.IsValid)
     TempData["Mensaje"] = "Hubo un error al agregar el Inmueble.";
     return RedirectToAction("Index");
 }
-
+/*
 public IActionResult Eliminar(int id)
 {
     var Inmuebles = repo.ObtenerPorID(id);
@@ -53,6 +67,31 @@ public IActionResult Eliminar(int id)
         }
         repo.EliminarInmuebles(id);
         TempData["Mensaje"] = "Inmueble eliminado.";
+        return RedirectToAction("Index");
+}
+*/
+public IActionResult Suspender(int id)
+{
+    var Inmuebles = repo.ObtenerPorID(id);
+    if (Inmuebles == null)
+        {
+            TempData["Mensaje"] = "Inmueble no encontrado.";
+            return RedirectToAction("Index");
+        }
+        repo.SuspenderInmuebles(id);
+        TempData["Mensaje"] = "Inmueble Suspendido.";
+        return RedirectToAction("Index");
+}
+public IActionResult Activar(int id)
+{
+    var Inmuebles = repo.ObtenerPorID2(id);
+    if (Inmuebles == null)
+        {
+            TempData["Mensaje"] = "Inmueble no encontrado.";
+            return RedirectToAction("Index");
+        }
+        repo.ActivarInmuebles(id);
+        TempData["Mensaje"] = "Inmueble Activado.";
         return RedirectToAction("Index");
 }
 public IActionResult Edicion(int id)
