@@ -30,6 +30,13 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
     ViewBag.Inmuebles = inmuebles;
     return View(paginacion);
 }
+public async Task<IActionResult> PagosAnulados(int pageNumber = 1, int pageSize = 5)
+{
+    var pagosQueryable = repo.ObtenerTodosPagosAnulados().AsQueryable();
+    var paginacion = await Paginacion<Pago>.CrearPaginacion(pagosQueryable, pageNumber, pageSize);
+
+    return View(paginacion);
+}
 public IActionResult Detalle(int id)
 {
       if (id == 0)

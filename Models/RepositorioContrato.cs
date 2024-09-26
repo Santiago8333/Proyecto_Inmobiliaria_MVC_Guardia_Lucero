@@ -379,4 +379,33 @@ public Contrato? ObtenerContratoPorFecha(int id, DateTime FechaDesde, DateTime F
 
     return res;
 }
+public List<Pago> ObtenerTodosPagosAnulados()
+{
+    List<Pago> contratos = new List<Pago>();
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"
+            SELECT * FROM pago WHERE Estado = 0";
+        
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            connection.Open();
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                contratos.Add(new Pago
+                {
+                    Id_contrato = reader.GetInt32("Id_contrato"),
+                    Id_pago = reader.GetInt32("Id_pago"),
+                    Fecha_pago = reader.GetDateTime("Fecha_pago"),
+                    Monto = reader.GetDecimal("Monto"),
+                    Estado = reader.GetBoolean(reader.GetOrdinal("Estado"))
+
+                });
+            }
+            connection.Close();
+        }
+        return contratos;
+    }
+}
 }
