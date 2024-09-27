@@ -9,44 +9,64 @@
 <div class="text-center">
 	<h1 class="display-4">Pagos Asocaidos al Contratos</h1>
 </div>
-<div class="text-center">
-	<a href="/Contrato/PagosAnulados" class="btn btn-info">
-      Pagos Anulados
-    </a>
-</div>
 <table class="table table-striped table-hover">
   <thead>
     <tr>
         <th>Fecha del pago</th>
         <th>Monto</th>
+        <th>Estado</th>
         <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
         @foreach (var item in Model)
 		{
- 
-			<tr>
-                <td>
+      if(@item.Estado){
+        <tr >
+        <td>
 					@item.Fecha_pago.ToString("dd-MM-yyyy")
 				</td>
-                <td>
+        <td>
 					@item.Monto
 				</td>
-                <td>
-                     <a href="javascript:void(0);" 
-                      data-id="@item.Id_pago" 
-                      class="btn btn-danger" 
-                      onclick="confirmDelete(this)">
-                        <i class="fa-solid fa-trash"></i>
-                  </a>
-                  </td>
+        <td>
+					Activo
+				</td>
+          <td>
+              <a href="javascript:void(0);" 
+                data-id="@item.Id_pago" 
+                  class="btn btn-danger" 
+                  onclick="confirmDelete(this)">
+                  <i class="fa-solid fa-trash"></i>
+              </a>
+          </td>
 			</tr>
+      }else{
+      <tr class="alert alert-danger" role="alert">
+        <td>
+					@item.Fecha_pago.ToString("dd-MM-yyyy")
+				</td>
+        <td>
+					@item.Monto
+				</td>
+        <td>
+					Anulado
+				</td>
+        <td>
+          <a href="javascript:void(0);" 
+                data-id="@item.Id_pago" 
+                class="btn btn-success" 
+                onclick="confirmDelete(this)">
+                <i class="fa-solid fa-trash"></i>
+          </a>
+        </td>
+			</tr>
+      }
 		}
         <tr>
             <td><strong>Monto Total a pagar: </strong>@MontoTotal</td>
             <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
-            <td><strong>Monto Total Pagado: </strong>@sumapagos</td>
+            <td colspan="2"><strong>Monto Total Pagado: </strong>@sumapagos</td>
         </tr>
   </tbody>
 </table>
@@ -54,7 +74,6 @@
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
   <i class="fa-solid fa-plus"></i>
 </button>
-
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -146,6 +165,9 @@
         }
     </ul>
 </nav>
+<div class="text-center">
+	<h1 class="display-4">Multas</h1>
+</div>
 <script>
         function confirmDelete(element) {
         var id = element.getAttribute("data-id");

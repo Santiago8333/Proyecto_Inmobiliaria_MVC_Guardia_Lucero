@@ -14,7 +14,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 		options.LoginPath = "/Usuario/Login";
 		options.LogoutPath = "/Usuario/Logout";
 		options.AccessDeniedPath = "/Home/Registringido";
-		options.ExpireTimeSpan = TimeSpan.FromMinutes(5);//Tiempo de expiración
+		options.ExpireTimeSpan = TimeSpan.FromMinutes(10);//Tiempo de expiración
 	});
 builder.Services.AddAuthorization(options =>
 {

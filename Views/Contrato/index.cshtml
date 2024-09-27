@@ -8,7 +8,6 @@
 <table class="table table-striped table-hover">
   <thead>
     <tr>
-        <th>Id_Contrato</th>
         <th>Email del inquilino</th>
         <th>Email del Propietario</th>
         <th>Tipo de Inmueble</th>
@@ -22,9 +21,6 @@
         @foreach (var item in Model)
 		{
 			<tr>
-				<td>
-					@Html.DisplayFor(modelItem => item.Id_contrato)
-				</td>
 				<td>
 					@Html.DisplayFor(modelItem => item.Emailinquilino)
 				</td>
@@ -68,7 +64,6 @@
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
   <i class="fa-solid fa-plus"></i>
 </button>
-
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -144,7 +139,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ¿Estás seguro de que deseas eliminar este Contrato?
+        ¿Estás seguro de que deseas cancelar este Contrato? puede causar una multa
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -213,7 +208,7 @@
     });
     function confirmDelete(element) {
         var id = element.getAttribute("data-id");
-        var url = "@Url.Action("Eliminar", "Contrato")" + "/" + id;
+        var url = "@Url.Action("TerminarContrato", "Contrato")" + "/" + id;
         document.getElementById("confirmDeleteButton").setAttribute("href", url);
         var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
         myModal.show();

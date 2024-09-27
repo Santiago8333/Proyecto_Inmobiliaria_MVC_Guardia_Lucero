@@ -30,13 +30,6 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
     ViewBag.Inmuebles = inmuebles;
     return View(paginacion);
 }
-public async Task<IActionResult> PagosAnulados(int pageNumber = 1, int pageSize = 5)
-{
-    var pagosQueryable = repo.ObtenerTodosPagosAnulados().AsQueryable();
-    var paginacion = await Paginacion<Pago>.CrearPaginacion(pagosQueryable, pageNumber, pageSize);
-
-    return View(paginacion);
-}
 public IActionResult Detalle(int id)
 {
       if (id == 0)
@@ -57,6 +50,7 @@ public IActionResult Detalle(int id)
     }
 
 }
+/*
 public IActionResult Eliminar(int id)
 {
   var contrato = repo.ObtenerPorID(id);
@@ -70,6 +64,80 @@ public IActionResult Eliminar(int id)
         return RedirectToAction("Index");
     
 }
+*/
+//--
+public IActionResult TerminarContrato(int id, DateTime fechaTerminacion)
+{
+    var contrato = repo.ObtenerPorID(id);
+    if (contrato == null)
+    {
+        TempData["Mensaje"] = "Contrato no encontrado.";
+        return RedirectToAction("Index");
+    }
+
+
+    // Verificar si debe meses
+    int mesesAdeudados = ObtenerMesesAdeudados(contrato);
+    if (mesesAdeudados > 0)
+    {
+        TempData["Mensaje"] = $"El inquilino debe {mesesAdeudados} meses de alquiler.";
+        return RedirectToAction("Detalles", new { id = contrato.Id_contrato });
+    }
+
+    // Calcular multa
+    decimal multa = CalcularMulta(contrato, fechaTerminacion);
+
+    // Registrar la terminación anticipada
+    contrato.FechaTerminacionAnticipada = fechaTerminacion;
+    repo.ActualizarContrato(contrato);
+
+    // Registrar la multa como un pago
+    RegistrarMulta(contrato.Id_contrato, multa);
+    TempData["Mensaje"] = $"Contrato terminado anticipadamente. Multa registrada: {multa:C}.";
+
+    
+    return RedirectToAction("Detalles", new { id = contrato.Id_contrato });
+}
+public int ObtenerMesesAdeudados(Contrato contrato)
+{
+    var fechaActual = DateTime.Now;
+    int mesesAlquiler = ((fechaActual.Year - contrato.Fecha_desde.Year) * 12) + fechaActual.Month - contrato.Fecha_desde.Month;
+
+    var pagosRealizados = repo.ObtenerPagoDelContrato(contrato.Id_contrato);
+    int mesesPagados = pagosRealizados.Count;
+
+    return mesesAlquiler - mesesPagados;
+}
+public decimal CalcularMulta(Contrato contrato, DateTime fechaTerminacion)
+{
+    // Calcula la duración original del contrato
+    var duracionTotal = (contrato.Fecha_hasta - contrato.Fecha_desde).TotalDays;
+    var duracionCumplida = (fechaTerminacion - contrato.Fecha_desde).TotalDays;
+
+    // Verifica si se cumplió menos de la mitad del tiempo
+    if (duracionCumplida < duracionTotal / 2)
+    {
+        // Multa de 2 meses extra
+        return contrato.Monto * 2;
+    }
+    else
+    {
+        // Multa de 1 mes extra
+        return contrato.Monto * 1;
+    }
+}
+public void RegistrarMulta(int contratoId, decimal montoMulta)
+{
+    var pago = new Pago
+    {
+        Id_contrato = contratoId,
+        Monto = montoMulta,
+        Fecha_pago = DateTime.Now,
+        
+    };
+    repo.AgregarPago(pago);
+}
+//--
 [HttpPost]
 public IActionResult Agregar(Contrato nuevoContrato)
 {
@@ -149,7 +217,7 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     }
     var pagos = repo.ObtenerPagoDelContrato(id);
     //suma de de los pagos
-    var sumpagos = pagos.Sum(p => p.Monto);
+    var sumpagos = pagos.Where(p => p.Estado == true).Sum(p => p.Monto);
     //caclular monto que falta pagar
     var MontoQueFaltaPagar =  contrato.Monto - sumpagos;
     // Si no hay pagos, permitimos que la vista se muestre vacía

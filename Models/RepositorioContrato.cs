@@ -198,7 +198,7 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
                     JOIN contrato c ON
                         c.Id_contrato = p.Id_contrato
                     WHERE
-                        c.Id_contrato = @Id AND p.Estado = TRUE";
+                        c.Id_contrato = @Id";
         using (MySqlCommand command = new MySqlCommand(query, connection))
         {
             // Agrega el parámetro id
