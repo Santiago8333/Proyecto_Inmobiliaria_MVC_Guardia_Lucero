@@ -18,8 +18,10 @@ public List<Contrato> ObtenerTodos()
                 c.Id_inmueble,
                 c.Id_inquilino,
                 c.Monto,
+                c.Monto_total,
                 c.Fecha_desde,
                 c.Fecha_hasta,
+                c.FechaTerminacion,
                 inq.Email AS Emailinquilino,
                 i.Tipo AS Inmuebletipo,
                 pro.Email AS EmailPropietario
@@ -42,8 +44,10 @@ public List<Contrato> ObtenerTodos()
                     Id_inmueble = reader.GetInt32("Id_inmueble"),
                     Id_inquilino = reader.GetInt32("Id_inquilino"),
                     Monto = reader.GetDecimal("Monto"),
+                    Monto_total = reader.GetDecimal("Monto_total"),
                     Fecha_desde = reader.GetDateTime("Fecha_desde"),
                     Fecha_hasta = reader.GetDateTime("Fecha_hasta"),
+                    FechaTerminacion = reader.GetDateTime("FechaTerminacion"),
                     Emailinquilino = reader.GetString("Emailinquilino"),
                     Inmuebletipo = reader.GetString("Inmuebletipo"),
                     EmailPropietario = reader.GetString("EmailPropietario"),
@@ -65,9 +69,12 @@ public Contrato? ObtenerPorID(int id)
                             c.Id_inmueble,
                             c.Id_inquilino,
                             c.Monto,
+                            c.Monto_total,
                             c.Fecha_desde,
                             c.Fecha_hasta,
                             c.Monto_Pagar,
+                            c.FechaTerminacion,
+                            c.Meses,
                             inq.Email AS Emailinquilino,
                             i.Tipo AS Inmuebletipo,
                             c.Estado,
@@ -97,14 +104,17 @@ public Contrato? ObtenerPorID(int id)
                     Id_inmueble = reader.GetInt32(nameof(Contrato.Id_inmueble)),
                     Id_inquilino = reader.GetInt32(nameof(Contrato.Id_inquilino)),
                     Monto = reader.GetDecimal(nameof(Contrato.Monto)),
+                    Monto_total = reader.GetDecimal(nameof(Contrato.Monto_total)),
                     Fecha_desde = reader.GetDateTime(nameof(Contrato.Fecha_desde)),
                     Fecha_hasta = reader.GetDateTime(nameof(Contrato.Fecha_hasta)),
+                    FechaTerminacion = reader.GetDateTime(nameof(Contrato.FechaTerminacion)),
                     Emailinquilino = reader.GetString(nameof(Contrato.Emailinquilino)),
                     Inmuebletipo = reader.GetString(nameof(Contrato.Inmuebletipo)),
                     Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado))),
                     EmailPropietario = reader.GetString(nameof(Contrato.EmailPropietario)),
                     Inmuebledireccion = reader.GetString(nameof(Contrato.Inmuebledireccion)),
-                    Monto_Pagar = reader.GetDecimal(nameof(Contrato.Monto_Pagar))
+                    Monto_Pagar = reader.GetDecimal(nameof(Contrato.Monto_Pagar)),
+                    Meses = reader.GetInt32(nameof(Contrato.Meses))
                     };
                 }
             }
@@ -135,16 +145,19 @@ public void AgregarContrato(Contrato nuevoContrato)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.Monto_Pagar)},{nameof(Contrato.Estado)})
-                    VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Fecha_desde,@Fecha_hasta,@Monto_Pagar, @Estado)";
+        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Monto_total)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.FechaTerminacion)},{nameof(Contrato.Monto_Pagar)},{nameof(Contrato.Meses)},{nameof(Contrato.Estado)})
+                    VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Monto_total,@Fecha_desde,@Fecha_hasta,@FechaTerminacion,@Monto_Pagar,@Meses,@Estado)";
         using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@Id_inquilino", nuevoContrato.Id_inquilino);
             command.Parameters.AddWithValue("@Id_inmueble", nuevoContrato.Id_inmueble);
             command.Parameters.AddWithValue("@Monto", nuevoContrato.Monto);
+            command.Parameters.AddWithValue("@Monto_total", nuevoContrato.Monto_total);
             command.Parameters.AddWithValue("@Fecha_desde", nuevoContrato.Fecha_desde);
             command.Parameters.AddWithValue("@Fecha_hasta", nuevoContrato.Fecha_hasta);
+            command.Parameters.AddWithValue("@FechaTerminacion", nuevoContrato.FechaTerminacion);
             command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto_Pagar);
+            command.Parameters.AddWithValue("@Meses", nuevoContrato.Meses);
             command.Parameters.AddWithValue("@Estado", true);
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción

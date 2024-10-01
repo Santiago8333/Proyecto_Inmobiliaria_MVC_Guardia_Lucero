@@ -147,6 +147,7 @@ public IActionResult Agregar(Contrato nuevoContrato)
         var contrato = repo.ObtenerContratoPorFecha(nuevoContrato.Id_inmueble,nuevoContrato.Fecha_desde,nuevoContrato.Fecha_hasta);
         if(contrato == null){
             nuevoContrato.Monto_Pagar = nuevoContrato.Monto;
+            nuevoContrato.FechaTerminacion = nuevoContrato.Fecha_hasta;
             repo.AgregarContrato(nuevoContrato);
         TempData["Mensaje"] = "Contrato agregado exitosamente.";
         return RedirectToAction("Index");
@@ -235,6 +236,7 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     ViewBag.Id_contrato = contrato.Id_contrato;
     ViewBag.MontoTotal = contrato.Monto;
     ViewBag.MontoQueFaltaPagar = MontoQueFaltaPagar;
+    ViewBag.Meses = contrato.Meses;
     return View(paginacion);
 }
 [HttpPost]
@@ -387,4 +389,5 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "Hubo un error al Modificar el Pago.";
 return RedirectToAction("Index");
 }
+
 }

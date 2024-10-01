@@ -37,7 +37,7 @@
                     @item.Fecha_desde.ToString("dd-MM-yyyy")
                 </td>
                 <td>
-                    @item.Fecha_hasta.ToString("dd-MM-yyyy")
+                    @item.FechaTerminacion.ToString("dd-MM-yyyy")
                 </td>
                 <td>
                   <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
@@ -107,9 +107,13 @@
           </datalist>
       </div>
         <div class="mb-3">
-            <label for="exampleInputMonto" class="form-label">Monto</label>
-            <input type="text" class="form-control" id="exampleInputMonto"  name="Monto">
+            <label for="exampleInputMonto" class="form-label">Monto mensual</label>
+            <input type="text" class="form-control" id="exampleInputMonto"  name="Monto" onchange="calcularFechaHasta()">
         </div>
+         <div class="mt-3">
+              <label for="exampleInputMonto_total" class="form-label">Monto Total</label>
+              <input type="number" class="form-control" id="exampleInputMonto_total" name="Monto_total" readonly >
+          </div>
         <div class="mb-3">
             <label for="exampleInputFecha_desde" class="form-label">Fecha desde</label>
             <input type="date" class="form-control" id="exampleInputFecha_desde" name="Fecha_desde" onchange="calcularFechaHasta()">
@@ -117,7 +121,7 @@
 
         <div class="mb-3">
             <label for="exampleInputMeses" class="form-label">Duración del contrato (meses)</label>
-            <input type="number" class="form-control" id="exampleInputMeses" name="Meses" min="1" max="24" value="1" onchange="calcularFechaHasta()">
+            <input type="number" class="form-control" id="exampleInputMeses" name="Meses" min="1" max="600" value="1" onchange="calcularFechaHasta()">
         </div>
 
         <div class="mb-3">
@@ -266,6 +270,8 @@ function seleccionarInmueble() {
     function calcularFechaHasta() {
         var fechaDesde = document.getElementById('exampleInputFecha_desde').value;
         var meses = document.getElementById('exampleInputMeses').value;
+        var monto = document.getElementById('exampleInputMonto').value;
+        var monto_total = document.getElementById('exampleInputMonto_total');
 
         if (fechaDesde && meses) {
             // Convertir la fecha de inicio a un objeto Date
@@ -281,6 +287,9 @@ function seleccionarInmueble() {
 
             // Establecer la fecha de fin en el campo "Fecha hasta"
             document.getElementById('exampleInputFecha_hasta').value = `${anio}-${mes}-${dia}`;
+            //establecer monto
+            monto_total.value = meses * monto;
+
         }
     }
 </script>

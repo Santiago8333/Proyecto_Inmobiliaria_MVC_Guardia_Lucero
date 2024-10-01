@@ -33,6 +33,10 @@
         <label for="Monto" class="form-label">Monto</label>
         <input type="text" class="form-control" id="Monto" name="Monto" value="@Model.Monto"readonly />
     </div>
+        <div class="mb-3">
+        <label for="Monto_total" class="form-label">Monto Total</label>
+        <input type="text" class="form-control" id="Monto_total" name="Monto_total" value="@Model.Monto_total"readonly />
+    </div>
     <div class="mb-3">
         <label for="Monto_Pagar" class="form-label">Monto que falta pagar</label>
         <input type="text" class="form-control" id="Monto_Pagar" name="Monto_Pagar" value="@Model.Monto_Pagar"readonly />
@@ -43,7 +47,7 @@
     </div>
     <div class="mb-3">
         <label for="Fecha_hasta" class="form-label">Fecha_hasta</label>
-        <input type="text" class="form-control" id="Fecha_hasta" name="Fecha_hasta" value="@Model.Fecha_hasta.ToString("dd-MM-yyyy")" readonly/>
+        <input type="text" class="form-control" id="Fecha_hasta" name="Fecha_hasta" value="@Model.FechaTerminacion.ToString("dd-MM-yyyy")" readonly/>
     </div>
     <div class="mb-3">
     <label for="Estado" class="form-label">Estado</label>
