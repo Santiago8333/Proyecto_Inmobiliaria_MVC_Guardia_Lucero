@@ -205,6 +205,7 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
                         p.Fecha_pago,
                         p.Monto,
                         p.Estado,
+                        p.Detalle,
                         c.Monto AS MontoTotalApagar
                     FROM
                         pago p
@@ -225,6 +226,7 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
                      Id_pago = reader.GetInt32("Id_pago"),
                      Id_contrato = reader.GetInt32("Id_contrato"),
                      Fecha_pago = reader.GetDateTime("Fecha_pago"),
+                     Detalle = reader.GetString("Detalle"),
                      Monto = reader.GetDecimal("Monto"),
                      Estado = reader.GetBoolean("Estado"),
                      MontoTotalApagar = reader.GetDecimal("MontoTotalApagar")
@@ -241,11 +243,12 @@ public void AgregarPago(Pago nuevoPago)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-    var query = $@"INSERT INTO pago ({nameof(Pago.Id_contrato)},{nameof(Pago.Fecha_pago)},{nameof(Pago.Monto)},{nameof(Pago.Estado)})
-                VALUES (@Id_contrato, @Fecha_pago, @Monto,@Estado)";
+    var query = $@"INSERT INTO pago ({nameof(Pago.Id_contrato)},{nameof(Pago.Detalle)},{nameof(Pago.Fecha_pago)},{nameof(Pago.Monto)},{nameof(Pago.Estado)})
+                VALUES (@Id_contrato,@Detalle, @Fecha_pago, @Monto,@Estado)";
      using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@Id_contrato", nuevoPago.Id_contrato);
+            command.Parameters.AddWithValue("@Detalle", nuevoPago.Detalle);
             command.Parameters.AddWithValue("@Fecha_pago", nuevoPago.Fecha_pago);
             command.Parameters.AddWithValue("@Monto", nuevoPago.Monto);
             command.Parameters.AddWithValue("@Estado", true);
@@ -421,4 +424,5 @@ public List<Pago> ObtenerTodosPagosAnulados()
         return contratos;
     }
 }
+
 }

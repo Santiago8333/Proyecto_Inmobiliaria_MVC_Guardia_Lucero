@@ -220,7 +220,7 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     //suma de de los pagos
     var sumpagos = pagos.Where(p => p.Estado == true).Sum(p => p.Monto);
     //caclular monto que falta pagar
-    var MontoQueFaltaPagar =  contrato.Monto - sumpagos;
+    var MontoQueFaltaPagar =  contrato.Monto_total - sumpagos;
     // Si no hay pagos, permitimos que la vista se muestre vacía
     if (pagos == null || !pagos.Any())
     {
@@ -274,7 +274,7 @@ public IActionResult AgregarPago(Pago nuevoPago)
     
     // Actualizar el contrato en la base de datos
     repo.ActualizarContratoMontoPagar(contrato);
-
+    
     // Agregar el nuevo pago
     repo.AgregarPago(nuevoPago);
 

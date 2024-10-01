@@ -15,6 +15,7 @@
     <tr>
         <th>Fecha del pago</th>
         <th>Monto</th>
+        <th>Detalle</th>
         <th>Estado</th>
         <th>Acciones</th>
     </tr>
@@ -29,6 +30,9 @@
 				</td>
         <td>
 					@item.Monto
+				</td>
+        <td>
+					@item.Detalle
 				</td>
         <td>
 					Activo
@@ -50,6 +54,9 @@
         <td>
 					@item.Monto
 				</td>
+         <td>
+					@item.Detalle
+				</td>
         <td>
 					Anulado
 				</td>
@@ -63,6 +70,7 @@
             <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
             <td><strong>Monto Total Pagado: </strong>@sumapagos</td>
             <td><strong>Meses que hay que pagar: </strong>@Meses</td>
+            <td></td>
         </tr>
   </tbody>
 </table>
@@ -79,11 +87,42 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        @if(@MontoQueFaltaPagar == 0){
+          <div class="alert alert-success" role="alert">
+            Contrato Pagado
+          </div>
+        }else{
        <form asp-action="AgregarPago" method="post" id="formAgregarPago">
         <div class="mb-3">
             <label for="exampleInputFecha_pago" class="form-label">Fecha del pago</label>
             <input type="hidden" id="Id_contrato" name="Id_contrato" value="@Id_contrato" readonly>
             <input type="date" class="form-control" id="exampleInputFecha_pago" name="Fecha_pago">
+        </div>
+         <div class="mb-3">
+        <label for="Detalle" class="form-label">Mes que corresponde al pago</label>
+        <select class="form-control" id="Detalle" name="Detalle">
+        @for (int i = 1; i <= ViewBag.Meses; i++)
+        {
+            // Bandera para determinar si el mes ya fue pagado
+            bool mesPagado = false;
+
+            // Recorremos los pagos para verificar si el mes ya está en Detalle
+            foreach (var item in Model)
+            {
+                if (item.Detalle == "Mes " + i)
+                {
+                    mesPagado = true;
+                    break; // No es necesario seguir verificando una vez encontrado
+                }
+            }
+
+            // Si el mes no está pagado, lo mostramos en el select
+            if (!mesPagado)
+            {
+                <option value="Mes @i">Mes @i</option>
+            }
+        }
+        </select>
         </div>
         <div class="mb-3">
             <label for="exampleInputMonto" class="form-label">Monto</label>
@@ -91,6 +130,7 @@
         </div>
         <button type="submit" class="btn btn-primary">Agregar</button>
     </form>
+    }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
