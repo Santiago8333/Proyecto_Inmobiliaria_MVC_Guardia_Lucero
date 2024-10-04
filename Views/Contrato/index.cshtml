@@ -102,13 +102,13 @@
           <datalist id="inmueblesList">
               @foreach (var inmueble in ViewBag.Inmuebles)
               {
-                  <option data-id="@inmueble.Id_inmueble" data-pe="@inmueble.EmailPropietario" value="@inmueble.Tipo - @inmueble.Direccion"></option>
+                  <option data-id="@inmueble.Id_inmueble" data-pe="@inmueble.EmailPropietario" data-pt="@inmueble.Precio" value="@inmueble.Tipo - @inmueble.Direccion"></option>
               }
           </datalist>
       </div>
         <div class="mb-3">
             <label for="exampleInputMonto" class="form-label">Monto mensual</label>
-            <input type="text" class="form-control" id="exampleInputMonto"  name="Monto" onchange="calcularFechaHasta()">
+            <input type="text" class="form-control" id="exampleInputMonto"  name="Monto" onchange="calcularFechaHasta()" readonly>
         </div>
          <div class="mt-3">
               <label for="exampleInputMonto_total" class="form-label">Monto Total</label>
@@ -260,10 +260,12 @@ function seleccionarInmueble() {
             // Si coincide, establece los valores correspondientes
             document.getElementById('Id_inmueble').value = options[i].getAttribute('data-id');
             document.getElementById('EmailPropietario').value = options[i].getAttribute('data-pe');
+            document.getElementById('exampleInputMonto').value = options[i].getAttribute('data-pt');
             break;
         }else{
             document.getElementById('Id_inmueble').value = null;
             document.getElementById('EmailPropietario').value = null;
+            document.getElementById('exampleInputMonto').value = null;
         }
     }
 }

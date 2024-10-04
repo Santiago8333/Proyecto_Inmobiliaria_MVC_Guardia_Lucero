@@ -17,27 +17,45 @@
  </datalist>
 </div>
 <div class="mb-3">
-<label for="exampleInputTipo" class="form-label">Inmueble Direccion</label>
-    <input list="inmueblesList" type="text" class="form-control" id="exampleInputTipo"  name="Tipo" value="@Model.Inmuebledireccion">
-    <input type="hidden" id="Id_inmueble" name="Id_inmueble" value="@Model.Id_inmueble">
-    <datalist id="inmueblesList">
-        @foreach (var inmuebles in ViewBag.Inmuebles)
-            {
-            <option data-id="@inmuebles.Id_inmueble" value="@inmuebles.Direccion">@inmuebles.Direccion</option>
-            }
-    </datalist>
+          <label for="exampleInputTipo" class="form-label">Tipo de Inmueble</label>
+          <input list="inmueblesList" type="text" class="form-control" id="exampleInputTipo" name="Tipo" value="@(Model.Inmuebletipo) - @(Model.Inmuebledireccion)" oninput="seleccionarInmueble()">
+          
+          <!-- Campo oculto para almacenar el Id del inmueble -->
+          <input type="hidden" id="Id_inmueble" name="Id_inmueble" value="@Model.Id_inmueble">
+
+          <!-- Campo visible para el email del propietario -->
+          <div class="mt-3">
+              <label for="exampleInputPropietario" class="form-label">Email del Propietario</label>
+              <input type="text" class="form-control" id="EmailPropietario" name="EmailPropietario" value="@Model.EmailPropietario" readonly>
+          </div>
+
+          <!-- Lista de selección con los inmuebles, mostrando tanto el tipo como una descripción única -->
+          <datalist id="inmueblesList">
+              @foreach (var inmueble in ViewBag.Inmuebles)
+              {
+                  <option data-id="@inmueble.Id_inmueble" data-pe="@inmueble.EmailPropietario" data-pt="@inmueble.Precio" value="@inmueble.Tipo - @inmueble.Direccion"></option>
+              }
+          </datalist>
 </div>
 <div class="mb-3">
     <label for="exampleInputMonto" class="form-label">Monto</label>
-    <input type="text" class="form-control" id="exampleInputMonto"  name="Monto" value="@Model.Monto">
+    <input type="text" class="form-control" id="exampleInputMonto"  name="Monto" value="@Model.Monto" readonly>
+</div>
+<div class="mt-3">
+    <label for="exampleInputMonto_total" class="form-label">Monto Total</label>
+    <input type="number" class="form-control" id="exampleInputMonto_total" name="Monto_total" value="@Model.Monto_total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" readonly >
 </div>
 <div class="mb-3">
     <label for="exampleInputFecha_desde" class="form-label">Fecha desde</label>
-    <input type="date" class="form-control" id="exampleInputFecha_desde" name="Fecha_desde" value="@Model.Fecha_desde.ToString("yyyy-MM-dd")">
+    <input type="date" class="form-control" id="exampleInputFecha_desde" name="Fecha_desde" value="@Model.Fecha_desde.ToString("yyyy-MM-dd")" onchange="calcularFechaHasta()">
+</div>
+<div class="mb-3">
+    <label for="exampleInputMeses" class="form-label">Duración del contrato (meses)</label>
+    <input type="number" class="form-control" id="exampleInputMeses" name="Meses" min="1" max="600"  value="@Model.Meses" onchange="calcularFechaHasta()">
 </div>
 <div class="mb-3">
     <label for="exampleInputFecha_hasta" class="form-label">Fecha hasta</label>
-    <input type="date" class="form-control" id="exampleInputFecha_hasta"  name="Fecha_hasta" value="@Model.Fecha_hasta.ToString("yyyy-MM-dd")">
+    <input type="date" class="form-control" id="exampleInputFecha_hasta" name="Fecha_hasta" value="@Model.FechaTerminacion.ToString("yyyy-MM-dd")" readonly>
 </div>
 <button type="submit" class="btn btn-primary" >Editar</button>
     </form>
@@ -51,34 +69,81 @@
    <label>Editar el inquilino asociado al contrato</label>
  </a>
 <script>
-         document.getElementById('exampleInputEmail').addEventListener('input', function() {
-        var input = this;
-        var list = document.getElementById('inquilinosList');
-        var hiddenInput = document.getElementById('Id_inquilinos');
-        var options = list.options;
+document.getElementById('exampleInputEmail').addEventListener('input', function() {
+    var input = this;
+    var list = document.getElementById('inquilinosList');
+    var hiddenInput = document.getElementById('Id_inquilinos');
+    var options = list.options;
 
-        hiddenInput.value = '';
+    hiddenInput.value = '';  // Reiniciar el valor oculto
 
-        for (var i = 0; i < options.length; i++) {
-            if (options[i].value === input.value) {
-                hiddenInput.value = options[i].getAttribute('data-id');
-                break;
-            }
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].value === input.value) {
+            hiddenInput.value = options[i].getAttribute('data-id');
+            break;
         }
-    });
-     document.getElementById('exampleInputTipo').addEventListener('input', function() {
-        var input = this;
-        var list = document.getElementById('inmueblesList');
-        var hiddenInput = document.getElementById('Id_inmueble');
-        var options = list.options;
+    }
+});
 
-        hiddenInput.value = '';
+document.getElementById('exampleInputTipo').addEventListener('input', function() {
+    var input = this;
+    var list = document.getElementById('inmueblesList');
+    var hiddenInput = document.getElementById('Id_inmueble');
+    var options = list.options;
 
-        for (var i = 0; i < options.length; i++) {
-            if (options[i].value === input.value) {
-                hiddenInput.value = options[i].getAttribute('data-id');
-                break;
-            }
+    hiddenInput.value = '';  // Reiniciar el valor oculto
+
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].value === input.value) {
+            hiddenInput.value = options[i].getAttribute('data-id');
+            break;
         }
-    });
+    }
+});
+function calcularFechaHasta() {
+    var fechaDesde = document.getElementById('exampleInputFecha_desde').value;
+    var meses = document.getElementById('exampleInputMeses').value;
+    var monto = parseFloat(document.getElementById('exampleInputMonto').value) || 0;
+    var monto_total = document.getElementById('exampleInputMonto_total');
+
+    if (fechaDesde && meses) {
+        // Convertir la fecha de inicio a un objeto Date
+        var fecha = new Date(fechaDesde);
+
+        // Sumar la cantidad de meses seleccionada
+        fecha.setMonth(fecha.getMonth() + parseInt(meses));
+
+        // Formatear la nueva fecha en formato YYYY-MM-DD
+        var dia = String(fecha.getDate()).padStart(2, '0');
+        var mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses son 0 indexados
+        var anio = fecha.getFullYear();
+
+        // Establecer la fecha de fin en el campo "Fecha hasta"
+        document.getElementById('exampleInputFecha_hasta').value = `${anio}-${mes}-${dia}`;
+
+        // Establecer el monto total
+        monto_total.value = meses * monto;
+    }
+}
+function seleccionarInmueble() {
+    // Obtén el valor seleccionado en el input de inmuebles
+    var input = document.getElementById('exampleInputTipo');
+    var dataList = document.getElementById('inmueblesList');
+    var options = dataList.options;
+
+    // Recorre las opciones de la datalist para encontrar la coincidencia
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].value === input.value) {
+            // Si coincide, establece los valores correspondientes
+            document.getElementById('Id_inmueble').value = options[i].getAttribute('data-id');
+            document.getElementById('EmailPropietario').value = options[i].getAttribute('data-pe');
+            document.getElementById('exampleInputMonto').value = options[i].getAttribute('data-pt');
+            break;
+        }else{
+            document.getElementById('Id_inmueble').value = null;
+            document.getElementById('EmailPropietario').value = null;
+            document.getElementById('exampleInputMonto').value = null;
+        }
+    }
+}
 </script>

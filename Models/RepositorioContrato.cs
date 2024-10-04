@@ -156,7 +156,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Fecha_desde", nuevoContrato.Fecha_desde);
             command.Parameters.AddWithValue("@Fecha_hasta", nuevoContrato.Fecha_hasta);
             command.Parameters.AddWithValue("@FechaTerminacion", nuevoContrato.FechaTerminacion);
-            command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto_Pagar);
+            command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto_total);
             command.Parameters.AddWithValue("@Meses", nuevoContrato.Meses);
             command.Parameters.AddWithValue("@Estado", true);
             connection.Open();

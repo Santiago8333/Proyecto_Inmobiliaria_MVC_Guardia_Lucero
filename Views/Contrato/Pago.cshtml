@@ -6,6 +6,7 @@
     decimal MontoTotal = ViewBag.MontoTotal;
     decimal MontoQueFaltaPagar = ViewBag.MontoQueFaltaPagar;
     int Meses = ViewBag.Meses;
+    DateTime fechaInicio = ViewBag.fechaInicio;
 }
 <div class="text-center">
 	<h1 class="display-4">Pagos Asocaidos al Contratos</h1>
@@ -109,17 +110,20 @@
             // Recorremos los pagos para verificar si el mes ya está en Detalle
             foreach (var item in Model)
             {
-                if (item.Detalle == "Mes " + i)
+                if (item.Detalle == "Mes " + i && item.Estado == true)
                 {
                     mesPagado = true;
                     break; // No es necesario seguir verificando una vez encontrado
                 }
             }
 
-            // Si el mes no está pagado, lo mostramos en el select
+            // Calcula la fecha del mes correspondiente sumando `i - 1` meses a la fecha de inicio
+            DateTime fechaMes = fechaInicio.AddMonths(i - 1);
+
+            // Si el mes no ha sido pagado, se muestra la opción correspondiente con la fecha del mes
             if (!mesPagado)
             {
-                <option value="Mes @i">Mes @i</option>
+                <option value="Mes @i">Cuota @fechaMes.ToString("MMMM yyyy")</option>
             }
         }
         </select>

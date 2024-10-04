@@ -191,7 +191,7 @@ public IActionResult Actualizar(Contrato actualizarContrato)
 if (ModelState.IsValid)
     {
         var pagos = repo.ObtenerPagoDelContrato(actualizarContrato.Id_contrato);
-        var sumpagos = pagos.Sum(p => p.Monto);
+        var sumpagos = pagos.Where(p => p.Estado == true).Sum(p => p.Monto);
         actualizarContrato.Monto_Pagar = actualizarContrato.Monto - sumpagos;
         repo.ActualizarContratoMontoPagar(actualizarContrato);
         repo.ActualizarContrato(actualizarContrato);
@@ -232,11 +232,13 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     // Realiza la paginación, aunque la lista esté vacía
     var pagosQueryable = pagos.AsQueryable();
     var paginacion = await Paginacion<Pago>.CrearPaginacion(pagosQueryable, pageNumber, pageSize); 
+    DateTime fechaInicio = contrato.Fecha_desde; 
     ViewBag.sumpagos = sumpagos;
     ViewBag.Id_contrato = contrato.Id_contrato;
     ViewBag.MontoTotal = contrato.Monto;
     ViewBag.MontoQueFaltaPagar = MontoQueFaltaPagar;
     ViewBag.Meses = contrato.Meses;
+    ViewBag.fechaInicio = fechaInicio;
     return View(paginacion);
 }
 [HttpPost]
