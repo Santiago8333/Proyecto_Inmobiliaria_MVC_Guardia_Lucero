@@ -190,8 +190,38 @@ public IActionResult Actualizar(Contrato actualizarContrato)
 {
 if (ModelState.IsValid)
     {
+        var contrato = repo.ObtenerPorID(actualizarContrato.Id_contrato);
+        if(contrato == null){
+            TempData["Mensaje"] = "Contrato no encontrado.";
+            return RedirectToAction("Index");
+        }
         var pagos = repo.ObtenerPagoDelContrato(actualizarContrato.Id_contrato);
+        var pagosA = repo.ObtenerPagoActivosDelContrato(actualizarContrato.Id_contrato);
+        // Verificar si alguno de los pagos tiene una fecha fuera del rango permitido
+        DateTime fechaInicioContrato = actualizarContrato.Fecha_desde;
+        DateTime fechaFinContrato = actualizarContrato.Fecha_hasta;
+
+        foreach (var pago in pagosA)
+        {
+            if (pago.Estado == true && (pago.Fecha_pago < fechaInicioContrato || pago.Fecha_pago > fechaFinContrato))
+            {
+                TempData["Mensaje"] = "No se puede modificar el contrato. Existen pagos con fecha fuera del rango permitido.";
+                return RedirectToAction("Index");
+            }
+        }
+
         var sumpagos = pagos.Where(p => p.Estado == true).Sum(p => p.Monto);
+        // Verificar si el nuevo Monto_total es menor que el actual y también menor que la suma de los pagos realizados
+        if (actualizarContrato.Monto_total < contrato.Monto_total)
+        {
+            if (actualizarContrato.Monto_total < sumpagos)
+            {
+                TempData["Mensaje"] = "No se puede modificar el contrato. El Monto_total ingresado es menor que los pagos ya realizados.";
+                return RedirectToAction("Index");
+            }
+        }
+        
+
         actualizarContrato.Monto_Pagar = actualizarContrato.Monto - sumpagos;
         repo.ActualizarContratoMontoPagar(actualizarContrato);
         repo.ActualizarContrato(actualizarContrato);

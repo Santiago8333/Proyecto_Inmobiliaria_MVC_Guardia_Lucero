@@ -14,6 +14,7 @@
 <table class="table table-striped table-hover">
   <thead>
     <tr>
+        <th>#</th>
         <th>Fecha del pago</th>
         <th>Monto</th>
         <th>Detalle</th>
@@ -22,10 +23,16 @@
     </tr>
   </thead>
   <tbody>
-        @foreach (var item in Model)
+     @{
+      int contador = 1; // Variable para numerar las filas
+      }
+    @foreach (var item in Model)
 		{
       if(@item.Estado){
-        <tr >
+        <tr>
+        <td>
+          @contador
+        </td>
         <td>
 					@item.Fecha_pago.ToString("dd-MM-yyyy")
 				</td>
@@ -50,6 +57,9 @@
       }else{
       <tr class="alert alert-danger" role="alert">
         <td>
+          @contador
+        </td>
+        <td>
 					@item.Fecha_pago.ToString("dd-MM-yyyy")
 				</td>
         <td>
@@ -67,6 +77,7 @@
       }
 		}
         <tr>
+            <td></td>
             <td><strong>Monto Total a pagar: </strong>@MontoTotal</td>
             <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
             <td><strong>Monto Total Pagado: </strong>@sumapagos</td>
@@ -101,29 +112,30 @@
         </div>
          <div class="mb-3">
         <label for="Detalle" class="form-label">Mes que corresponde al pago</label>
-        <select class="form-control" id="Detalle" name="Detalle">
+        <select class="form-control" id="Detalle" name="Detalle" >
         @for (int i = 1; i <= ViewBag.Meses; i++)
         {
             // Bandera para determinar si el mes ya fue pagado
             bool mesPagado = false;
 
+           // Calcula la fecha del mes correspondiente sumando `i - 1` meses a la fecha de inicio
+            DateTime fechaMes = fechaInicio.AddMonths(i - 1);
+
             // Recorremos los pagos para verificar si el mes ya está en Detalle
             foreach (var item in Model)
             {
-                if (item.Detalle == "Mes " + i && item.Estado == true)
+                if (item.Detalle == "Cuota "+@fechaMes.ToString("MMMM yyyy") && item.Estado == true)
                 {
                     mesPagado = true;
                     break; // No es necesario seguir verificando una vez encontrado
                 }
             }
 
-            // Calcula la fecha del mes correspondiente sumando `i - 1` meses a la fecha de inicio
-            DateTime fechaMes = fechaInicio.AddMonths(i - 1);
 
             // Si el mes no ha sido pagado, se muestra la opción correspondiente con la fecha del mes
             if (!mesPagado)
             {
-                <option value="Mes @i">Cuota @fechaMes.ToString("MMMM yyyy")</option>
+                <option value="Cuota @fechaMes.ToString("MMMM yyyy")">Cuota @fechaMes.ToString("MMMM yyyy")</option>
             }
         }
         </select>
@@ -226,5 +238,41 @@ document.addEventListener("DOMContentLoaded", function() {
     // Establecer el monto predeterminado
     var montoInput = document.getElementById("exampleInputMonto");
     montoInput.value = @MontoTotal; // Cambia este valor por el monto que desees
+
+// Escucha el evento change del select para actualizar la fecha de pago
+document.getElementById("Detalle").addEventListener("change", function() {
+            actualizarFechaPago();
+});
+   function actualizarFechaPago() {
+            // Obtiene el valor seleccionado del select (la fecha en formato "MMMM yyyy")
+            var fechaSeleccionada = document.getElementById("Detalle").value;
+
+            // Divide el valor seleccionado en mes y año
+            var partesFecha = fechaSeleccionada.split(' ');
+            var mes = partesFecha[1];  // Cambia de '0' a '1' ya que "Mes" ocupa el primer espacio
+            var anio = partesFecha[2]; 
+
+            // Convierte el nombre del mes a número (diccionario en español)
+            var meses = {
+                'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04',
+                'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08',
+                'septiembre': '09', 'octubre': '10', 'noviembre': '11', 'diciembre': '12'
+            };
+            var mesNumero = meses[mes.toLowerCase()];
+
+            // Verifica si el mes fue encontrado
+            if (!mesNumero) {
+                console.error("Mes no válido:", mes);
+                return; // Detener si no hay mes válido
+            }
+
+            // Usa el primer día del mes para formar una fecha completa
+            var dia = '01';
+
+            // Asigna la fecha formateada al campo de fecha de pago
+            var fechaFormateada = anio + '-' + mesNumero + '-' + dia;
+            document.getElementById("exampleInputFecha_pago").value = fechaFormateada;
+        }
+actualizarFechaPago();
 });
 </script>

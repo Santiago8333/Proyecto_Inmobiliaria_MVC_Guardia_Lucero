@@ -239,6 +239,51 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
     
     return pagos.Any() ? pagos : pagos = new List<Pago>();;
 }
+public List<Pago> ObtenerPagoActivosDelContrato(int id)
+{
+List<Pago> pagos = new List<Pago>();
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT
+                        p.Id_pago,
+                        p.Id_contrato,
+                        p.Fecha_pago,
+                        p.Monto,
+                        p.Estado,
+                        p.Detalle,
+                        c.Monto AS MontoTotalApagar
+                    FROM
+                        pago p
+                    JOIN contrato c ON
+                        c.Id_contrato = p.Id_contrato
+                    WHERE
+                        c.Id_contrato = @Id AND p.Estado = true";
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+            pagos.Add(new Pago
+                {
+                     Id_pago = reader.GetInt32("Id_pago"),
+                     Id_contrato = reader.GetInt32("Id_contrato"),
+                     Fecha_pago = reader.GetDateTime("Fecha_pago"),
+                     Detalle = reader.GetString("Detalle"),
+                     Monto = reader.GetDecimal("Monto"),
+                     Estado = reader.GetBoolean("Estado"),
+                     MontoTotalApagar = reader.GetDecimal("MontoTotalApagar")
+                });
+                
+            }
+            connection.Close();
+        }
+    }
+    
+    return pagos.Any() ? pagos : pagos = new List<Pago>();;
+}
 public void AgregarPago(Pago nuevoPago)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
