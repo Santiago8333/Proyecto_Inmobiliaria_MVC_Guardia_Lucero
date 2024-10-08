@@ -297,6 +297,25 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         connection.Close();
     }
 }
+}
+public void ActualizarContratoMonto(Inmuebles actualizarInmueble)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+{
+    var query = $@"UPDATE
+                        contrato
+                    SET
+                        Monto = @Monto
+                WHERE Id_inmueble = @Id_inmueble";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+    {
+        command.Parameters.AddWithValue("@Id_inmueble", actualizarInmueble.Id_inmueble);
+        command.Parameters.AddWithValue("@Monto", actualizarInmueble.Precio);
+        connection.Open();
+        command.ExecuteNonQuery(); 
+        connection.Close();
+    }
+}
 
 }
 }

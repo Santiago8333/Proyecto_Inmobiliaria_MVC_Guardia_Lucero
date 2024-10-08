@@ -121,6 +121,9 @@ public IActionResult Actualizar(Inmuebles actualizarInmueble)
 {
 if (ModelState.IsValid)
     {
+        //actualizar Monto en el contrato si tiene
+        repo.ActualizarContratoMonto(actualizarInmueble);
+        //actualizar
         repo.ActualizarInmueble(actualizarInmueble);
         TempData["Mensaje"] = "Inmueble Modificado correctamente.";
         return RedirectToAction("Index");

@@ -303,6 +303,28 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         }
     }
 }
+public void AgregarMulta(Multa nuevoMulta)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+    var query = $@"INSERT INTO multa(
+                    {nameof(Multa.Id_contrato)},
+                    {nameof(Multa.Monto)},
+                    {nameof(Multa.RazonMulta)},
+                    {nameof(Multa.Fecha)})
+                VALUES(@Id_contrato,@Monto,@RazonMulta,@Fecha)";
+    using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id_contrato", nuevoMulta.Id_contrato);
+            command.Parameters.AddWithValue("@Monto", nuevoMulta.Monto);
+            command.Parameters.AddWithValue("@RazonMulta", nuevoMulta.RazonMulta);
+            command.Parameters.AddWithValue("@Fecha", nuevoMulta.Fecha);
+            connection.Open();
+            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            connection.Close();
+        }
+    }
+}
 public void ActualizarContratoMontoPagar(Contrato contrato)
 {
     using(MySqlConnection connection = new MySqlConnection(ConectionString))
@@ -469,5 +491,25 @@ public List<Pago> ObtenerTodosPagosAnulados()
         return contratos;
     }
 }
-
+public void ActualizarContratoMulta(Contrato actualizarContrato)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+       var query = $@"UPDATE
+                            contrato
+                        SET
+                            Monto_total = @Monto_total,
+                            Meses = @Meses
+                        WHERE
+                            Id_contrato = @Id_contrato;";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Monto_total", actualizarContrato.Monto_total);
+            command.Parameters.AddWithValue("@Meses", actualizarContrato.Meses);
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+    }
+}
 }

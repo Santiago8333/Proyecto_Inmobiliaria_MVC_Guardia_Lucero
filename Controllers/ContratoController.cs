@@ -86,13 +86,25 @@ public IActionResult TerminarContrato(int id, DateTime fechaTerminacion)
 
     // Calcular multa
     decimal multa = CalcularMulta(contrato, fechaTerminacion);
-
+    var duracionTotal = (contrato.Fecha_hasta - contrato.Fecha_desde).TotalDays;
+    var duracionCumplida = (fechaTerminacion - contrato.Fecha_desde).TotalDays;
+    var razon = "";
+     if (duracionCumplida < duracionTotal / 2)
+    {
+         razon = "Multa de 2 Meses,No se Cumplio menos de la mitad del tiempo de la duracion del contrato";
+        
+    }
+    else
+    {
+         razon = "Multa de 2 Meses No se Cumplio la duracion del contrato";
+       
+    }
     // Registrar la terminación anticipada
     contrato.FechaTerminacionAnticipada = fechaTerminacion;
-    repo.ActualizarContrato(contrato);
+    //repo.ActualizarContrato(contrato);
 
     // Registrar la multa como un pago
-    RegistrarMulta(contrato.Id_contrato, multa);
+    RegistrarMulta(contrato.Id_contrato, multa,razon);
     TempData["Mensaje"] = $"Contrato terminado anticipadamente. Multa registrada: {multa:C}.";
 
     
@@ -118,24 +130,33 @@ public decimal CalcularMulta(Contrato contrato, DateTime fechaTerminacion)
     if (duracionCumplida < duracionTotal / 2)
     {
         // Multa de 2 meses extra
-        return contrato.Monto * 2;
+        //actualizar contrato
+        contrato.Meses += 2; 
+        contrato.Monto_total = contrato.Monto * contrato.Meses;
+        repo.ActualizarContratoMulta(contrato);
+        return contrato.Monto_total;
     }
     else
     {
         // Multa de 1 mes extra
-        return contrato.Monto * 1;
+        //actualizar contrato
+        contrato.Meses += 1; 
+        contrato.Monto_total = contrato.Monto * contrato.Meses;
+        repo.ActualizarContratoMulta(contrato);
+        return contrato.Monto_total;
     }
 }
-public void RegistrarMulta(int contratoId, decimal montoMulta)
+public void RegistrarMulta(int contratoId, decimal montoMulta, string razon)
 {
-    var pago = new Pago
+    var multa = new Multa
     {
         Id_contrato = contratoId,
         Monto = montoMulta,
-        Fecha_pago = DateTime.Now,
+        RazonMulta = razon,
+        Fecha = DateTime.Now,
         
     };
-    repo.AgregarPago(pago);
+    repo.AgregarMulta(multa);
 }
 //--
 [HttpPost]
@@ -190,6 +211,7 @@ public IActionResult Actualizar(Contrato actualizarContrato)
 {
 if (ModelState.IsValid)
     {
+        //verificar si el contrato existe
         var contrato = repo.ObtenerPorID(actualizarContrato.Id_contrato);
         if(contrato == null){
             TempData["Mensaje"] = "Contrato no encontrado.";
@@ -265,6 +287,7 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     DateTime fechaInicio = contrato.Fecha_desde; 
     ViewBag.sumpagos = sumpagos;
     ViewBag.Id_contrato = contrato.Id_contrato;
+    ViewBag.TotalAPagar = contrato.Monto_total;
     ViewBag.MontoTotal = contrato.Monto;
     ViewBag.MontoQueFaltaPagar = MontoQueFaltaPagar;
     ViewBag.Meses = contrato.Meses;
