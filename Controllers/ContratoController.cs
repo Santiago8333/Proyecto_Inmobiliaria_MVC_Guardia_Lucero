@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Inmobiliaria_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Diagnostics.Contracts;
 
 namespace Proyecto_Inmobiliaria_MVC.Controllers;
 [Authorize]
@@ -66,15 +67,20 @@ public IActionResult Eliminar(int id)
 }
 */
 //--
-public IActionResult TerminarContrato(int id, DateTime fechaTerminacion)
+public IActionResult TerminarContrato(int id)
 {
+    DateTime fechaTerminacion = DateTime.Now;
     var contrato = repo.ObtenerPorID(id);
     if (contrato == null)
     {
         TempData["Mensaje"] = "Contrato no encontrado.";
         return RedirectToAction("Index");
     }
-
+    if (contrato.Estado == false)
+    {
+        TempData["Mensaje"] = "No se puede Canselar un Contrato ya canselado.";
+        return RedirectToAction("Index");
+    }
 
     // Verificar si debe meses
     int mesesAdeudados = ObtenerMesesAdeudados(contrato);
@@ -89,6 +95,7 @@ public IActionResult TerminarContrato(int id, DateTime fechaTerminacion)
     var duracionTotal = (contrato.Fecha_hasta - contrato.Fecha_desde).TotalDays;
     var duracionCumplida = (fechaTerminacion - contrato.Fecha_desde).TotalDays;
     var razon = "";
+
      if (duracionCumplida < duracionTotal / 2)
     {
          razon = "Multa de 2 Meses,No se Cumplio menos de la mitad del tiempo de la duracion del contrato";
@@ -101,7 +108,7 @@ public IActionResult TerminarContrato(int id, DateTime fechaTerminacion)
     }
     // Registrar la terminación anticipada
     contrato.FechaTerminacionAnticipada = fechaTerminacion;
-    //repo.ActualizarContrato(contrato);
+    repo.ActualizarContratoFechaTerminacion(contrato);
 
     // Registrar la multa como un pago
     RegistrarMulta(contrato.Id_contrato, multa,razon);
@@ -125,7 +132,9 @@ public decimal CalcularMulta(Contrato contrato, DateTime fechaTerminacion)
     // Calcula la duración original del contrato
     var duracionTotal = (contrato.Fecha_hasta - contrato.Fecha_desde).TotalDays;
     var duracionCumplida = (fechaTerminacion - contrato.Fecha_desde).TotalDays;
-
+    var pagos = repo.ObtenerPagoDelContrato(contrato.Id_contrato);
+    //suma de de los pagos
+    var sumpagos = pagos.Where(p => p.Estado == true).Sum(p => p.Monto);
     // Verifica si se cumplió menos de la mitad del tiempo
     if (duracionCumplida < duracionTotal / 2)
     {
@@ -133,8 +142,9 @@ public decimal CalcularMulta(Contrato contrato, DateTime fechaTerminacion)
         //actualizar contrato
         contrato.Meses += 2; 
         contrato.Monto_total = contrato.Monto * contrato.Meses;
+        contrato.Monto_Pagar = contrato.Monto_total - sumpagos;
         repo.ActualizarContratoMulta(contrato);
-        return contrato.Monto_total;
+        return contrato.Monto * 2;
     }
     else
     {
@@ -142,8 +152,9 @@ public decimal CalcularMulta(Contrato contrato, DateTime fechaTerminacion)
         //actualizar contrato
         contrato.Meses += 1; 
         contrato.Monto_total = contrato.Monto * contrato.Meses;
+        contrato.Monto_Pagar = contrato.Monto_total - sumpagos;
         repo.ActualizarContratoMulta(contrato);
-        return contrato.Monto_total;
+        return contrato.Monto * 1;
     }
 }
 public void RegistrarMulta(int contratoId, decimal montoMulta, string razon)
@@ -279,7 +290,8 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
         ViewBag.Mensaje = "No hay pagos registrados para este contrato.";
         pagos = new List<Pago>();  // Inicializa una lista vacía de pagos
     }
-
+    //obtener lista de multas
+    var multas = repo.ObtenerMultasContrato(contrato.Id_contrato);
 
     // Realiza la paginación, aunque la lista esté vacía
     var pagosQueryable = pagos.AsQueryable();
@@ -292,6 +304,7 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     ViewBag.MontoQueFaltaPagar = MontoQueFaltaPagar;
     ViewBag.Meses = contrato.Meses;
     ViewBag.fechaInicio = fechaInicio;
+    ViewBag.Multas = multas;
     return View(paginacion);
 }
 [HttpPost]

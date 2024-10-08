@@ -14,12 +14,15 @@
         <th>Monto Total</th>
         <th>Fecha desde</th>
         <th>Fecha_hasta</th>
+        <th>Fecha de Terminacion</th>
+        <th>Estado</th>
         <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
         @foreach (var item in Model)
 		{
+      if(@item.Estado){
 			<tr>
 				<td>
 					@Html.DisplayFor(modelItem => item.Emailinquilino)
@@ -37,7 +40,13 @@
                     @item.Fecha_desde.ToString("dd-MM-yyyy")
                 </td>
                 <td>
-                    @item.FechaTerminacion.ToString("dd-MM-yyyy")
+                    @item.Fecha_hasta.ToString("dd-MM-yyyy")
+                </td>
+                <td>
+                    No tiene
+                </td>
+                <td>
+                    Activo
                 </td>
                 <td>
                   <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
@@ -57,6 +66,42 @@
                   </a>
 				</td>
 			</tr>
+      }else{
+    <tr class="alert alert-danger" role="alert">
+				<td>
+					@Html.DisplayFor(modelItem => item.Emailinquilino)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.EmailPropietario)
+				</td>
+        <td>
+					@Html.DisplayFor(modelItem => item.Inmuebletipo)
+				</td>
+        <td>
+					@Html.DisplayFor(modelItem => item.Monto_total)
+				</td>
+               <td>
+                    @item.Fecha_desde.ToString("dd-MM-yyyy")
+                </td>
+                <td>
+                    @item.Fecha_hasta.ToString("dd-MM-yyyy")
+                </td>
+                  <td>
+                     @item.FechaTerminacion.ToString("dd-MM-yyyy")
+                </td>
+                <td>
+                    Anulado
+                </td>
+                <td>
+                  <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
+                      <i class="fa-solid fa-info"></i>
+                  </a>
+                  <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
+                      <i class="fa-solid fa-money-bill"></i>
+                  </a>
+				</td>
+			</tr>
+      }
 		}
   </tbody>
 </table>

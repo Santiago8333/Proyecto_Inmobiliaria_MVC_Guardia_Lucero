@@ -22,6 +22,7 @@ public List<Contrato> ObtenerTodos()
                 c.Fecha_desde,
                 c.Fecha_hasta,
                 c.FechaTerminacion,
+                c.Estado,
                 inq.Email AS Emailinquilino,
                 i.Tipo AS Inmuebletipo,
                 pro.Email AS EmailPropietario
@@ -30,7 +31,7 @@ public List<Contrato> ObtenerTodos()
             JOIN inmuebles i ON i.Id_inmueble = c.Id_inmueble
             JOIN inquilinos inq ON inq.Id_inquilinos = c.Id_inquilino
             JOIN propietarios pro ON pro.Id_propietarios = i.Id_propietario
-            WHERE c.Estado = true";
+            WHERE 1";
         
         using (MySqlCommand command = new MySqlCommand(query, connection))
         {
@@ -51,6 +52,7 @@ public List<Contrato> ObtenerTodos()
                     Emailinquilino = reader.GetString("Emailinquilino"),
                     Inmuebletipo = reader.GetString("Inmuebletipo"),
                     EmailPropietario = reader.GetString("EmailPropietario"),
+                    Estado = reader.GetBoolean(reader.GetOrdinal("Estado")),
                 });
             }
             connection.Close();
@@ -85,7 +87,7 @@ public Contrato? ObtenerPorID(int id)
                         JOIN inmuebles i ON i.Id_inmueble = c.Id_inmueble
                         JOIN inquilinos inq ON inq.Id_inquilinos = c.Id_inquilino
                         JOIN propietarios pro ON pro.Id_propietarios = i.Id_propietario
-                      WHERE c.Id_contrato = @Id AND c.Estado = true";
+                      WHERE c.Id_contrato = @Id";
 
         using (MySqlCommand command = new MySqlCommand(query, connection))
         {
@@ -499,17 +501,80 @@ public void ActualizarContratoMulta(Contrato actualizarContrato)
                             contrato
                         SET
                             Monto_total = @Monto_total,
-                            Meses = @Meses
+                            Meses = @Meses,
+                            Monto_Pagar = @Monto_Pagar
                         WHERE
                             Id_contrato = @Id_contrato;";
  using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@Monto_total", actualizarContrato.Monto_total);
             command.Parameters.AddWithValue("@Meses", actualizarContrato.Meses);
+            command.Parameters.AddWithValue("@Monto_Pagar", actualizarContrato.Monto_Pagar);
+            command.Parameters.AddWithValue("@Id_contrato", actualizarContrato.Id_contrato);
             connection.Open();
             command.ExecuteNonQuery(); 
             connection.Close();
         }
     }
+}
+public void ActualizarContratoFechaTerminacion(Contrato actualizarContrato)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE contrato 
+               SET 
+                   {nameof(Contrato.FechaTerminacion)} = @FechaTerminacion 
+               WHERE Id_contrato = @Id";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@FechaTerminacion", actualizarContrato.FechaTerminacionAnticipada);
+            command.Parameters.AddWithValue("@Id", actualizarContrato.Id_contrato);
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+
+    }
+
+}
+public List<Multa> ObtenerMultasContrato(int id)
+{
+
+List<Multa> multa = new List<Multa>();
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT
+                        Id_multa,
+                        Id_contrato,
+                        Monto,
+                        RazonMulta,
+                        Fecha
+                    FROM
+                        multa
+                    WHERE
+                        Id_contrato = @Id";
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+            multa.Add(new Multa
+                {
+                    Id_multa = reader.GetInt32("Id_multa"),
+                    Id_contrato = reader.GetInt32("Id_contrato"),
+                    Monto = reader.GetInt32("Monto"),
+                    RazonMulta = reader.GetString("RazonMulta"),
+                    Fecha = reader.GetDateTime("Fecha")
+                });
+                
+            }
+            connection.Close();
+        }
+    }
+    
+    return multa.Any() ? multa : multa = new List<Multa>();;
 }
 }
