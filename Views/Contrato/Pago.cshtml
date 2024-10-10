@@ -27,11 +27,16 @@
   <tbody>
      @{
       int contador = 0; // Variable para numerar las filas
+      int MesesPagados = 0;
+      int MesesDeuda = 0;
       }
     @foreach (var item in Model)
 		{
       contador += 1;
       if(@item.Estado){
+        //numero de meses pagados
+        MesesPagados += 1;
+        MesesDeuda = Meses - MesesPagados;
         <tr>
         <td>
           @contador
@@ -85,7 +90,7 @@
             <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
             <td><strong>Monto Total Pagado: </strong>@sumapagos</td>
             <td><strong>Meses que hay que pagar: </strong>@Meses</td>
-            <td></td>
+            <td><strong>Meses adeudados: </strong>@MesesDeuda</td>
         </tr>
   </tbody>
 </table>
@@ -133,7 +138,6 @@
                     break; // No es necesario seguir verificando una vez encontrado
                 }
             }
-
 
             // Si el mes no ha sido pagado, se muestra la opción correspondiente con la fecha del mes
             if (!mesPagado)

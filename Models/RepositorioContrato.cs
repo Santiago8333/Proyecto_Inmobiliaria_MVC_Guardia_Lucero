@@ -23,6 +23,7 @@ public List<Contrato> ObtenerTodos()
                 c.Fecha_hasta,
                 c.FechaTerminacion,
                 c.Estado,
+                c.Contrato_Completado,
                 inq.Email AS Emailinquilino,
                 i.Tipo AS Inmuebletipo,
                 pro.Email AS EmailPropietario
@@ -53,6 +54,7 @@ public List<Contrato> ObtenerTodos()
                     Inmuebletipo = reader.GetString("Inmuebletipo"),
                     EmailPropietario = reader.GetString("EmailPropietario"),
                     Estado = reader.GetBoolean(reader.GetOrdinal("Estado")),
+                    Contrato_Completado = reader.GetBoolean(reader.GetOrdinal("Contrato_Completado")),
                 });
             }
             connection.Close();
@@ -77,6 +79,7 @@ public Contrato? ObtenerPorID(int id)
                             c.Monto_Pagar,
                             c.FechaTerminacion,
                             c.Meses,
+                            c.Contrato_Completado,
                             inq.Email AS Emailinquilino,
                             i.Tipo AS Inmuebletipo,
                             c.Estado,
@@ -116,7 +119,8 @@ public Contrato? ObtenerPorID(int id)
                     EmailPropietario = reader.GetString(nameof(Contrato.EmailPropietario)),
                     Inmuebledireccion = reader.GetString(nameof(Contrato.Inmuebledireccion)),
                     Monto_Pagar = reader.GetDecimal(nameof(Contrato.Monto_Pagar)),
-                    Meses = reader.GetInt32(nameof(Contrato.Meses))
+                    Meses = reader.GetInt32(nameof(Contrato.Meses)),
+                    Contrato_Completado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Contrato_Completado))),
                     };
                 }
             }
@@ -576,5 +580,25 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
     }
     
     return multa.Any() ? multa : multa = new List<Multa>();;
+}
+public void ActualizarContratoCompletado(Contrato actualizarContrato)
+{
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE contrato 
+               SET 
+                   {nameof(Contrato.Contrato_Completado)} = @Contrato_Completado
+               WHERE Id_contrato = @Id";
+ using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Contrato_Completado", actualizarContrato.Contrato_Completado);
+            command.Parameters.AddWithValue("@Id", actualizarContrato.Id_contrato);
+            connection.Open();
+            command.ExecuteNonQuery(); 
+            connection.Close();
+        }
+
+    }
+
 }
 }

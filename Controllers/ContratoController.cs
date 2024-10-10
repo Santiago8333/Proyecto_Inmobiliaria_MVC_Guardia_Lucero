@@ -342,10 +342,27 @@ public IActionResult AgregarPago(Pago nuevoPago)
     
     // Actualizar el contrato en la base de datos
     repo.ActualizarContratoMontoPagar(contrato);
-    
     // Agregar el nuevo pago
     repo.AgregarPago(nuevoPago);
-
+    //veririficar si se pago todo el contrato
+    var pagosActivos = repo.ObtenerPagoActivosDelContrato(contrato.Id_contrato);
+    // Total de meses del contrato
+    var totalMeses = contrato.Meses;
+    var mesesPagados = pagosActivos.Count();
+    var mesesApagar = totalMeses - mesesPagados;
+if (mesesApagar <= 0)
+{
+    // Todos los meses han sido pagados
+    contrato.Contrato_Completado = true;
+    repo.ActualizarContratoCompletado(contrato);
+    TempData["Mensaje"] = "El contrato ya está completamente pagado.";
+    return RedirectToAction("Index");
+}
+else
+{
+    // Mostrar la cantidad de meses restantes por pagar
+    TempData["Mensaje"] = $"Faltan {mesesApagar} meses por pagar en el contrato.";
+}
     TempData["Mensaje"] = "Pago agregado al Contrato exitosamente.";
     return RedirectToAction("Index");
 }
@@ -370,6 +387,18 @@ public IActionResult EliminarPago(int id)
         
         // Actualizar el contrato en la base de datos
         repo.ActualizarContratoMontoPagar(contrato);
+        //Actualizar Contrato_Completado
+        //veririficar si se pago todo el contrato
+        var pagosActivos = repo.ObtenerPagoActivosDelContrato(contrato.Id_contrato);
+        // Total de meses del contrato
+        var totalMeses = contrato.Meses;
+        var mesesPagados = pagosActivos.Count();
+        var mesesApagar = totalMeses - mesesPagados;
+if (mesesApagar > 0)
+{
+    contrato.Contrato_Completado = false;
+    repo.ActualizarContratoCompletado(contrato);
+}
         TempData["Mensaje"] = "Pago eliminado.";
         return RedirectToAction("Index");
 }

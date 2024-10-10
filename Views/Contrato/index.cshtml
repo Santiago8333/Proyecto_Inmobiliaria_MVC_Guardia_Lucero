@@ -66,7 +66,7 @@
                   </a>
 				</td>
 			</tr>
-      }else{
+    }else{
     <tr class="alert alert-danger" role="alert">
 				<td>
 					@Html.DisplayFor(modelItem => item.Emailinquilino)
@@ -80,25 +80,25 @@
         <td>
 					@Html.DisplayFor(modelItem => item.Monto_total)
 				</td>
-               <td>
-                    @item.Fecha_desde.ToString("dd-MM-yyyy")
-                </td>
-                <td>
-                    @item.Fecha_hasta.ToString("dd-MM-yyyy")
-                </td>
-                  <td>
-                     @item.FechaTerminacion.ToString("dd-MM-yyyy")
-                </td>
-                <td>
-                    Anulado
-                </td>
-                <td>
-                  <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
-                      <i class="fa-solid fa-info"></i>
-                  </a>
-                  <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
-                      <i class="fa-solid fa-money-bill"></i>
-                  </a>
+        <td>
+            @item.Fecha_desde.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            @item.Fecha_hasta.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            @item.FechaTerminacion.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            Anulado
+        </td>
+        <td>
+          <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
+                <i class="fa-solid fa-info"></i>
+            </a>
+          <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
+              <i class="fa-solid fa-money-bill"></i>
+          </a>
 				</td>
 			</tr>
       }

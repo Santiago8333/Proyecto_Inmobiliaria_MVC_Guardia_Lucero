@@ -17,4 +17,5 @@ public class Contrato{
      public decimal Monto_Pagar {get;set;}
      public int Meses {get;set;}
      public bool Estado {get;set;} = false;
+     public bool Contrato_Completado {get;set;} = false;
 }
