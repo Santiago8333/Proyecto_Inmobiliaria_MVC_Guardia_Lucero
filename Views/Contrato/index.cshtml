@@ -23,6 +23,51 @@
         @foreach (var item in Model)
 		{
       if(@item.Estado){
+      if(@item.Contrato_Completado){
+			<tr class="alert alert-success" role="alert">
+				<td>
+					@Html.DisplayFor(modelItem => item.Emailinquilino)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.EmailPropietario)
+				</td>
+        <td>
+					@Html.DisplayFor(modelItem => item.Inmuebletipo)
+				</td>
+        <td>
+					@Html.DisplayFor(modelItem => item.Monto_total)
+				</td>
+        <td>
+            @item.Fecha_desde.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            @item.Fecha_hasta.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            No tiene
+        </td>
+        <td>
+            Completado
+        </td>
+        <td>
+        <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
+            <i class="fa-solid fa-info"></i>
+        </a>
+          <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
+              <i class="fa-solid fa-money-bill"></i>
+        </a>
+          <a href="javascript:void(0);" 
+            id="renovar"
+            data-id="@item.Id_contrato" 
+            data-fecha="@item.Fecha_hasta.ToString("dd-MM-yyyy")"
+            data-monto="@item.Monto"
+            class="btn btn-success"
+            onclick="mostrarModalRenovar(@item.Id_contrato,'@item.Fecha_hasta.ToString("yyyy-MM-dd")',@item.Monto)">
+            <i class="fa-solid fa-sync"></i> Renovar
+          </a>
+				</td>
+			</tr>
+      }else{
 			<tr>
 				<td>
 					@Html.DisplayFor(modelItem => item.Emailinquilino)
@@ -36,36 +81,37 @@
         <td>
 					@Html.DisplayFor(modelItem => item.Monto_total)
 				</td>
-               <td>
-                    @item.Fecha_desde.ToString("dd-MM-yyyy")
-                </td>
-                <td>
-                    @item.Fecha_hasta.ToString("dd-MM-yyyy")
-                </td>
-                <td>
-                    No tiene
-                </td>
-                <td>
-                    Activo
-                </td>
-                <td>
-                  <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
-                      <i class="fa-solid fa-info"></i>
-                  </a>
-                    <a href="@Url.Action("Edicion", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
-                      <i class="fa-solid fa-pencil"></i>
-                  </a>
-                  <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
-                      <i class="fa-solid fa-money-bill"></i>
-                  </a>
-                     <a href="javascript:void(0);" 
-                      data-id="@item.Id_contrato" 
-                      class="btn btn-danger" 
-                      onclick="confirmDelete(this)">
-                        <i class="fa-solid fa-trash"></i>
-                  </a>
+        <td>
+            @item.Fecha_desde.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            @item.Fecha_hasta.ToString("dd-MM-yyyy")
+        </td>
+        <td>
+            No tiene
+        </td>
+        <td>
+            Activo
+        </td>
+        <td>
+        <a href="@Url.Action("Detalle", "Contrato", new { id = item.Id_contrato }) " class="btn btn-info">
+            <i class="fa-solid fa-info"></i>
+        </a>
+          <a href="@Url.Action("Edicion", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
+           <i class="fa-solid fa-pencil"></i>
+          </a>
+          <a href="@Url.Action("Pago", "Contrato", new { id = item.Id_contrato}) " class="btn btn-primary">
+              <i class="fa-solid fa-money-bill"></i>
+          </a>
+            <a href="javascript:void(0);" 
+                data-id="@item.Id_contrato" 
+                class="btn btn-success" 
+                onclick="confirmDelete(this)">
+                <i class="fa-solid fa-rotate-right"></i>
+            </a>
 				</td>
 			</tr>
+    }
     }else{
     <tr class="alert alert-danger" role="alert">
 				<td>
@@ -213,6 +259,46 @@
     </div>
   </div>
 </div>
+<!-- Modal para renovar contrato -->
+<div class="modal fade" id="modalRenovarContrato" tabindex="-1" aria-labelledby="modalRenovarContratoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRenovarContratoLabel">Renovar Contrato</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formRenovarContrato" action="/Contrato/Renovar" method="post">
+          <input type="hidden" name="Id_contrato" id="Id_contrato_renovar" value="">
+          <div class="mb-3">
+            <label for="Fecha_nueva" class="form-label">Nueva Fecha de Inicio</label>
+            <input type="date" class="form-control" id="Fecha_nueva" name="Fecha_nueva" required>
+          </div>
+          <div class="mb-3">
+            <label for="Fecha_hasta" class="form-label">Fecha hasta</label>
+            <input type="date" class="form-control" id="Fecha_hasta" name="Fecha_hasta" required readonly>
+          </div>
+          <div class="mb-3">
+            <label for="nuevoMonto" class="form-label">Monto mensual</label>
+            <input type="text" class="form-control" id="nuevoMonto"  name="Monto"  value="" readonly>
+        </div>
+         <div class="mt-3">
+              <label for="exampleInputMonto_total" class="form-label">Monto Total</label>
+              <input type="number" class="form-control" id="exampleInputMonto_total" name="Monto_total" readonly >
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputMeses" class="form-label">Duración del contrato (meses)</label>
+            <input type="number" class="form-control" id="exampleInputMeses" name="Meses" min="1" max="600" value="1">
+        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Renovar Contrato</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Paginación -->
 <nav aria-label="Navegación de página">
     <ul class="pagination justify-content-center">
@@ -339,4 +425,29 @@ function seleccionarInmueble() {
 
         }
     }
+    function mostrarModalRenovar(idContrato,fecha,monto) {
+      console.log("monto: "+monto);
+    // Asignar el ID del contrato al campo oculto en el formulario del modal
+    document.getElementById('Id_contrato_renovar').value = idContrato;
+    // Si la fecha viene en formato string, primero conviértela en un objeto Date
+    var fechaObj = new Date(fecha);
+
+    fechaObj.setDate(fechaObj.getDate() + 2);
+
+    // Formatear la fecha a "yyyy-MM-dd"
+    var year = fechaObj.getFullYear();
+    var month = ('0' + (fechaObj.getMonth() + 1)).slice(-2); // Agregar el 0 si es necesario
+    var day = ('0' + fechaObj.getDate()).slice(-2);
+
+    var fechaFormateada = `${year}-${month}-${day}`;
+
+    // Asignar la fecha formateada al campo de la nueva fecha en el modal
+    document.getElementById('Fecha_nueva').value = fechaFormateada;
+    //monto
+    document.getElementById('nuevoMonto').value = monto;
+    
+    // Mostrar el modal
+    var modalRenovar = new bootstrap.Modal(document.getElementById('modalRenovarContrato'));
+    modalRenovar.show();
+}
 </script>
