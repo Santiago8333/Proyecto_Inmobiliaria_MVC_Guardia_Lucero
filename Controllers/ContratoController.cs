@@ -486,5 +486,27 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "Hubo un error al Modificar el Pago.";
 return RedirectToAction("Index");
 }
+[HttpPost]
+public IActionResult Renovar(Contrato contratoRenovado)
+{
+    var contrato = repo.ObtenerPorID(contratoRenovado.Id_contrato);
+    if (contrato == null)
+    {
+        TempData["Mensaje"] = "Contrato no encontrado.";
+        return RedirectToAction("Index");
+    }
+    if (ModelState.IsValid)
+    {
+        contratoRenovado.Id_inmueble = contrato.Id_inmueble;
+        contratoRenovado.Id_inquilino = contrato.Id_inquilino;
+        contratoRenovado.Monto_Pagar = contratoRenovado.Monto;
+        // Lógica para renovar el contrato
+        repo.RenovarContrato(contratoRenovado);
+        TempData["Mensaje"] = "Contrato renovado exitosamente.";
+        return RedirectToAction("Index");
+    }
+    TempData["Error"] = "Error al renovar el contrato.";
+    return RedirectToAction("Index");
+}
 
 }

@@ -601,4 +601,50 @@ public void ActualizarContratoCompletado(Contrato actualizarContrato)
     }
 
 }
+public void RenovarContrato(Contrato contratoRenovado)
+{
+using(MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"INSERT INTO contrato(
+                    { nameof(Contrato.Id_inquilino) },
+                    { nameof(Contrato.Id_inmueble) },
+                    { nameof(Contrato.Monto) },
+                    { nameof(Contrato.Monto_total) },
+                    { nameof(Contrato.Fecha_desde) },
+                    { nameof(Contrato.Fecha_hasta) },
+                    { nameof(Contrato.FechaTerminacion) },
+                    { nameof(Contrato.Monto_Pagar) },
+                    { nameof(Contrato.Meses) },
+                    { nameof(Contrato.Estado) }
+                )
+                VALUES(
+                    @Id_inquilino,
+                    @Id_inmueble,
+                    @Monto,
+                    @Monto_total,
+                    @Fecha_desde,
+                    @Fecha_hasta,
+                    @FechaTerminacion,
+                    @Monto_Pagar,
+                    @Meses,
+                    @Estado
+                )";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Id_inquilino", contratoRenovado.Id_inquilino);
+            command.Parameters.AddWithValue("@Id_inmueble", contratoRenovado.Id_inmueble);
+            command.Parameters.AddWithValue("@Monto", contratoRenovado.Monto);
+            command.Parameters.AddWithValue("@Monto_total", contratoRenovado.Monto_total);
+            command.Parameters.AddWithValue("@Fecha_desde", contratoRenovado.Fecha_desde);
+            command.Parameters.AddWithValue("@Fecha_hasta", contratoRenovado.Fecha_hasta);
+            command.Parameters.AddWithValue("@FechaTerminacion", contratoRenovado.FechaTerminacion);
+            command.Parameters.AddWithValue("@Monto_Pagar", contratoRenovado.Monto_total);
+            command.Parameters.AddWithValue("@Meses", contratoRenovado.Meses);
+            command.Parameters.AddWithValue("@Estado", true);
+            connection.Open();
+            command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
+            connection.Close();
+        }
+    }
+}
 }

@@ -272,23 +272,23 @@
           <input type="hidden" name="Id_contrato" id="Id_contrato_renovar" value="">
           <div class="mb-3">
             <label for="Fecha_nueva" class="form-label">Nueva Fecha de Inicio</label>
-            <input type="date" class="form-control" id="Fecha_nueva" name="Fecha_nueva" required>
+            <input type="date" class="form-control" id="Fecha_nueva" name="Fecha_desde" required>
           </div>
           <div class="mb-3">
-            <label for="Fecha_hasta" class="form-label">Fecha hasta</label>
-            <input type="date" class="form-control" id="Fecha_hasta" name="Fecha_hasta" required readonly>
+            <label for="nuevoFecha_hasta" class="form-label">Fecha hasta</label>
+            <input type="date" class="form-control" id="nuevoFecha_hasta" name="Fecha_hasta" required readonly>
           </div>
           <div class="mb-3">
             <label for="nuevoMonto" class="form-label">Monto mensual</label>
             <input type="text" class="form-control" id="nuevoMonto"  name="Monto"  value="" readonly>
         </div>
          <div class="mt-3">
-              <label for="exampleInputMonto_total" class="form-label">Monto Total</label>
-              <input type="number" class="form-control" id="exampleInputMonto_total" name="Monto_total" readonly >
+              <label for="nuevoMonto_total" class="form-label">Monto Total</label>
+              <input type="number" class="form-control" id="nuevoMonto_total" name="Monto_total" readonly >
           </div>
           <div class="mb-3">
-            <label for="exampleInputMeses" class="form-label">Duración del contrato (meses)</label>
-            <input type="number" class="form-control" id="exampleInputMeses" name="Meses" min="1" max="600" value="1">
+            <label for="nuevoMeses" class="form-label">Duración del contrato (meses)</label>
+            <input type="number" class="form-control" id="nuevoMeses" name="Meses" min="1" max="600" value="1">
         </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -355,8 +355,46 @@
                 toast.show();
             </text>
         }
+        document.getElementById('nuevoMeses').addEventListener('input', function() {
+    calcularFechaHastaYMontoTotal();
+  });
+
+  document.getElementById('Fecha_nueva').addEventListener('change', function() {
+    calcularFechaHastaYMontoTotal();
+  });
+
+  function calcularFechaHastaYMontoTotal() {
+    // Obtener la fecha de inicio
+    var fechaInicio = document.getElementById('Fecha_nueva').value;
+    var meses = parseInt(document.getElementById('nuevoMeses').value);
+    var montoMensual = parseFloat(document.getElementById('nuevoMonto').value);
+
+    if (fechaInicio && meses > 0 && !isNaN(montoMensual)) {
+      // Convertir la fecha de inicio a un objeto Date
+      var fechaObj = new Date(fechaInicio);
       
-    });
+      // Calcular la nueva fecha "hasta" sumando los meses
+      fechaObj.setMonth(fechaObj.getMonth() + meses);
+
+      // Formatear la nueva fecha "hasta" a 'yyyy-MM-dd'
+      var year = fechaObj.getFullYear();
+      var month = ('0' + (fechaObj.getMonth() + 1)).slice(-2); // Asegurarse de que el mes tenga dos dígitos
+      var day = ('0' + fechaObj.getDate()).slice(-2); // Asegurarse de que el día tenga dos dígitos
+
+      // Actualizar la fecha hasta en el campo correspondiente
+      var fechaHastaFormateada = `${year}-${month}-${day}`;
+      document.getElementById('nuevoFecha_hasta').value = fechaHastaFormateada;
+
+      // Calcular el monto total (meses * monto mensual)
+      var montoTotal = meses * montoMensual;
+      document.getElementById('nuevoMonto_total').value = montoTotal;
+    } else {
+      // Si faltan datos, limpiar la fecha hasta y el monto total
+      document.getElementById('nuevoFecha_hasta').value = '';
+      document.getElementById('nuevoMonto_total').value = '';
+    }
+  }
+  });
     function confirmDelete(element) {
         var id = element.getAttribute("data-id");
         var url = "@Url.Action("TerminarContrato", "Contrato")" + "/" + id;
@@ -425,27 +463,53 @@ function seleccionarInmueble() {
 
         }
     }
-    function mostrarModalRenovar(idContrato,fecha,monto) {
-      console.log("monto: "+monto);
+function mostrarModalRenovar(idContrato, fecha, monto) {
     // Asignar el ID del contrato al campo oculto en el formulario del modal
     document.getElementById('Id_contrato_renovar').value = idContrato;
-    // Si la fecha viene en formato string, primero conviértela en un objeto Date
+
+    // Convertir la fecha en un objeto Date
     var fechaObj = new Date(fecha);
 
-    fechaObj.setDate(fechaObj.getDate() + 2);
+    // Agregar 1 día a la fecha de inicio
+    fechaObj.setDate(fechaObj.getDate() + 1);
 
-    // Formatear la fecha a "yyyy-MM-dd"
+    // Formatear la fecha "yyyy-MM-dd"
     var year = fechaObj.getFullYear();
-    var month = ('0' + (fechaObj.getMonth() + 1)).slice(-2); // Agregar el 0 si es necesario
-    var day = ('0' + fechaObj.getDate()).slice(-2);
+    var month = ('0' + (fechaObj.getMonth() + 1)).slice(-2); // Asegurarse de que el mes tenga dos dígitos
+    var day = ('0' + fechaObj.getDate()).slice(-2); // Asegurarse de que el día tenga dos dígitos
 
     var fechaFormateada = `${year}-${month}-${day}`;
 
     // Asignar la fecha formateada al campo de la nueva fecha en el modal
     document.getElementById('Fecha_nueva').value = fechaFormateada;
-    //monto
+
+    // Asignar el monto al campo correspondiente
     document.getElementById('nuevoMonto').value = monto;
-    
+
+    var meses = parseInt(document.getElementById('nuevoMeses').value); 
+
+    if (!isNaN(meses) && meses > 0) {
+        // Crear una copia del objeto de fecha para calcular la fecha "hasta"
+        var fechaHastaObj = new Date(fecha);
+
+        // Ajustar el mes de la fecha hasta
+        fechaHastaObj.setMonth(fechaHastaObj.getMonth() + meses);
+
+        // Formatear la fecha "hasta"
+        var year2 = fechaHastaObj.getFullYear();
+        var month2 = ('0' + (fechaHastaObj.getMonth() + 1)).slice(-2);
+        var day2 = ('0' + fechaHastaObj.getDate()).slice(-2);
+
+        var fechaHastaFormateada = `${year2}-${month2}-${day2}`;
+
+        // Actualizar el campo "nuevoFecha_hasta"
+        document.getElementById('nuevoFecha_hasta').value = fechaHastaFormateada;
+
+        // Calcular el monto total (meses * monto mensual)
+        var montoTotal = meses * monto;
+        document.getElementById('nuevoMonto_total').value = montoTotal;
+    }
+
     // Mostrar el modal
     var modalRenovar = new bootstrap.Modal(document.getElementById('modalRenovarContrato'));
     modalRenovar.show();
