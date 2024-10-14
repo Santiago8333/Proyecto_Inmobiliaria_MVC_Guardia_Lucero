@@ -430,14 +430,16 @@ public void ActualizarPago(Pago actualizarPago)
 public Contrato? ObtenerContratoPorFecha(int id, DateTime FechaDesde, DateTime FechaHasta)
 {
     Contrato? res = null;
-    
+
     using (MySqlConnection connection = new MySqlConnection(ConectionString))
     {
+        
         var query = @"SELECT * 
                       FROM contrato 
                       WHERE Id_inmueble = @Id
                       AND Estado = 1
                       AND ((Fecha_desde <= @Fecha_hasta AND Fecha_hasta >= @Fecha_desde));";
+
 
         using (MySqlCommand command = new MySqlCommand(query, connection))
         {
@@ -646,5 +648,72 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             connection.Close();
         }
     }
+}
+public Contrato? ObtenerPorIDTerminado(int id)
+{
+    Contrato? res = null;
+
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT
+                            c.Id_contrato,
+                            c.Id_inmueble,
+                            c.Id_inquilino,
+                            c.Monto,
+                            c.Monto_total,
+                            c.Fecha_desde,
+                            c.Fecha_hasta,
+                            c.Monto_Pagar,
+                            c.FechaTerminacion,
+                            c.Meses,
+                            c.Contrato_Completado,
+                            inq.Email AS Emailinquilino,
+                            i.Tipo AS Inmuebletipo,
+                            c.Estado,
+                            pro.Email AS EmailPropietario,
+                            i.Direccion AS Inmuebledireccion
+                        FROM
+                            contrato c
+                        JOIN inmuebles i ON i.Id_inmueble = c.Id_inmueble
+                        JOIN inquilinos inq ON inq.Id_inquilinos = c.Id_inquilino
+                        JOIN propietarios pro ON pro.Id_propietarios = i.Id_propietario
+                      WHERE c.Id_contrato = @Id AND c.Contrato_Completado = true";
+
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+
+            connection.Open();
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Contrato
+                    {
+                    Id_contrato = reader.GetInt32(nameof(Contrato.Id_contrato)),
+                    Id_inmueble = reader.GetInt32(nameof(Contrato.Id_inmueble)),
+                    Id_inquilino = reader.GetInt32(nameof(Contrato.Id_inquilino)),
+                    Monto = reader.GetDecimal(nameof(Contrato.Monto)),
+                    Monto_total = reader.GetDecimal(nameof(Contrato.Monto_total)),
+                    Fecha_desde = reader.GetDateTime(nameof(Contrato.Fecha_desde)),
+                    Fecha_hasta = reader.GetDateTime(nameof(Contrato.Fecha_hasta)),
+                    FechaTerminacion = reader.GetDateTime(nameof(Contrato.FechaTerminacion)),
+                    Emailinquilino = reader.GetString(nameof(Contrato.Emailinquilino)),
+                    Inmuebletipo = reader.GetString(nameof(Contrato.Inmuebletipo)),
+                    Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Estado))),
+                    EmailPropietario = reader.GetString(nameof(Contrato.EmailPropietario)),
+                    Inmuebledireccion = reader.GetString(nameof(Contrato.Inmuebledireccion)),
+                    Monto_Pagar = reader.GetDecimal(nameof(Contrato.Monto_Pagar)),
+                    Meses = reader.GetInt32(nameof(Contrato.Meses)),
+                    Contrato_Completado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Contrato_Completado))),
+                    };
+                }
+            }
+        }
+    }
+
+    return res; 
 }
 }

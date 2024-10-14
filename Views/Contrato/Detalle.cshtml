@@ -39,7 +39,11 @@
     </div>
     <div class="mb-3">
         <label for="Fecha_hasta" class="form-label">Fecha_hasta</label>
-        <input type="text" class="form-control" id="Fecha_hasta" name="Fecha_hasta" value="@Model.FechaTerminacion.ToString("dd-MM-yyyy")" readonly/>
+        <input type="text" class="form-control" id="Fecha_hasta" name="Fecha_hasta" value="@Model.Fecha_hasta.ToString("dd-MM-yyyy")" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="FechaTerminacion" class="form-label">Fecha Terminacion</label>
+        <input type="text" class="form-control" id="FechaTerminacion" name="FechaTerminacion" value="@Model.FechaTerminacion.ToString("dd-MM-yyyy")" readonly/>
     </div>
     <div class="mb-3">
     <label for="Estado" class="form-label">Estado</label>

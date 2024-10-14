@@ -489,17 +489,24 @@ return RedirectToAction("Index");
 [HttpPost]
 public IActionResult Renovar(Contrato contratoRenovado)
 {
-    var contrato = repo.ObtenerPorID(contratoRenovado.Id_contrato);
+    //verificar si el contrato que se va a renovar esta completo
+    var contrato = repo.ObtenerPorIDTerminado(contratoRenovado.Id_contrato);
     if (contrato == null)
     {
         TempData["Mensaje"] = "Contrato no encontrado.";
         return RedirectToAction("Index");
     }
+    contratoRenovado.Id_inmueble = contrato.Id_inmueble;
+    contratoRenovado.Id_inquilino = contrato.Id_inquilino;
+    contratoRenovado.Monto_Pagar = contratoRenovado.Monto;
+    contratoRenovado.FechaTerminacion = contratoRenovado.Fecha_hasta;
+    //verificar si hay un contrato ya en ese rango de fecha
+    var contrato2 = repo.ObtenerContratoPorFecha(contratoRenovado.Id_inmueble,contratoRenovado.Fecha_desde,contratoRenovado.Fecha_hasta);
+    if(contrato2 == null)
+    {
+    //Console.WriteLine("Ingreso: "+contratoRenovado.Fecha_desde+" "+contratoRenovado.Fecha_hasta+" "+contratoRenovado.Id_inmueble);
     if (ModelState.IsValid)
     {
-        contratoRenovado.Id_inmueble = contrato.Id_inmueble;
-        contratoRenovado.Id_inquilino = contrato.Id_inquilino;
-        contratoRenovado.Monto_Pagar = contratoRenovado.Monto;
         // Lógica para renovar el contrato
         repo.RenovarContrato(contratoRenovado);
         TempData["Mensaje"] = "Contrato renovado exitosamente.";
@@ -507,6 +514,13 @@ public IActionResult Renovar(Contrato contratoRenovado)
     }
     TempData["Error"] = "Error al renovar el contrato.";
     return RedirectToAction("Index");
+    }
+    else
+    {
+        Console.WriteLine("Ingreso fuera");
+        TempData["Mensaje"] = "Contrato ya exsiste un contrato en ese rango de fechas.";
+        return RedirectToAction("Index");
+    }
 }
 
 }
