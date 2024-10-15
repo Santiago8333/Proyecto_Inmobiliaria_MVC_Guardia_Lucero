@@ -24,6 +24,8 @@ public List<Contrato> ObtenerTodos()
                 c.FechaTerminacion,
                 c.Estado,
                 c.Contrato_Completado,
+                c.Create_user,
+                c.Terminate_user,
                 inq.Email AS Emailinquilino,
                 i.Tipo AS Inmuebletipo,
                 pro.Email AS EmailPropietario
@@ -55,6 +57,8 @@ public List<Contrato> ObtenerTodos()
                     EmailPropietario = reader.GetString("EmailPropietario"),
                     Estado = reader.GetBoolean(reader.GetOrdinal("Estado")),
                     Contrato_Completado = reader.GetBoolean(reader.GetOrdinal("Contrato_Completado")),
+                    Create_user = reader.GetString("Create_user"),
+                    Terminate_user = reader.GetString("Terminate_user"),
                 });
             }
             connection.Close();
@@ -80,6 +84,8 @@ public Contrato? ObtenerPorID(int id)
                             c.FechaTerminacion,
                             c.Meses,
                             c.Contrato_Completado,
+                            c.Create_user,
+                            c.Terminate_user,
                             inq.Email AS Emailinquilino,
                             i.Tipo AS Inmuebletipo,
                             c.Estado,
@@ -121,6 +127,8 @@ public Contrato? ObtenerPorID(int id)
                     Monto_Pagar = reader.GetDecimal(nameof(Contrato.Monto_Pagar)),
                     Meses = reader.GetInt32(nameof(Contrato.Meses)),
                     Contrato_Completado = reader.GetBoolean(reader.GetOrdinal(nameof(Contrato.Contrato_Completado))),
+                    Create_user = reader.GetString(nameof(Contrato.Create_user)),
+                    Terminate_user = reader.GetString(nameof(Contrato.Terminate_user)),
                     };
                 }
             }
@@ -151,8 +159,32 @@ public void AgregarContrato(Contrato nuevoContrato)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-        var query = $@"INSERT INTO contrato ({nameof(Contrato.Id_inquilino)},{nameof(Contrato.Id_inmueble)},{nameof(Contrato.Monto)},{nameof(Contrato.Monto_total)},{nameof(Contrato.Fecha_desde)},{nameof(Contrato.Fecha_hasta)},{nameof(Contrato.FechaTerminacion)},{nameof(Contrato.Monto_Pagar)},{nameof(Contrato.Meses)},{nameof(Contrato.Estado)})
-                    VALUES (@Id_inquilino, @Id_inmueble, @Monto,@Monto_total,@Fecha_desde,@Fecha_hasta,@FechaTerminacion,@Monto_Pagar,@Meses,@Estado)";
+        var query = $@"INSERT INTO contrato(
+                            { nameof(Contrato.Id_inquilino) },
+                            { nameof(Contrato.Id_inmueble) },
+                            { nameof(Contrato.Monto) },
+                            { nameof(Contrato.Monto_total) },
+                            { nameof(Contrato.Fecha_desde) },
+                            { nameof(Contrato.Fecha_hasta) },
+                            { nameof(Contrato.FechaTerminacion) },
+                            { nameof(Contrato.Monto_Pagar) },
+                            { nameof(Contrato.Meses) },
+                            { nameof(Contrato.Estado) },
+                            { nameof(Contrato.Create_user) }
+                        )
+                        VALUES(
+                            @Id_inquilino,
+                            @Id_inmueble,
+                            @Monto,
+                            @Monto_total,
+                            @Fecha_desde,
+                            @Fecha_hasta,
+                            @FechaTerminacion,
+                            @Monto_Pagar,
+                            @Meses,
+                            @Estado,
+                            @Create_user
+                        )";
         using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@Id_inquilino", nuevoContrato.Id_inquilino);
@@ -165,6 +197,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Monto_Pagar", nuevoContrato.Monto_total);
             command.Parameters.AddWithValue("@Meses", nuevoContrato.Meses);
             command.Parameters.AddWithValue("@Estado", true);
+            command.Parameters.AddWithValue("@Create_user", nuevoContrato.Create_user);
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
             connection.Close();
@@ -212,6 +245,8 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
                         p.Monto,
                         p.Estado,
                         p.Detalle,
+                        p.Create_user,
+                        p.Anulado_user,
                         c.Monto AS MontoTotalApagar
                     FROM
                         pago p
@@ -229,13 +264,16 @@ using (MySqlConnection connection = new MySqlConnection(ConectionString))
             {
             pagos.Add(new Pago
                 {
-                     Id_pago = reader.GetInt32("Id_pago"),
-                     Id_contrato = reader.GetInt32("Id_contrato"),
-                     Fecha_pago = reader.GetDateTime("Fecha_pago"),
-                     Detalle = reader.GetString("Detalle"),
-                     Monto = reader.GetDecimal("Monto"),
-                     Estado = reader.GetBoolean("Estado"),
-                     MontoTotalApagar = reader.GetDecimal("MontoTotalApagar")
+                    Id_pago = reader.GetInt32("Id_pago"),
+                    Id_contrato = reader.GetInt32("Id_contrato"),
+                    Fecha_pago = reader.GetDateTime("Fecha_pago"),
+                    Detalle = reader.GetString("Detalle"),
+                    Monto = reader.GetDecimal("Monto"),
+                    Estado = reader.GetBoolean("Estado"),
+                    MontoTotalApagar = reader.GetDecimal("MontoTotalApagar"),
+                    Create_user = reader.GetString("Create_user"),
+                    Anulado_user = reader.GetString("Anulado_user"),
+                    
                 });
                 
             }
@@ -294,8 +332,8 @@ public void AgregarPago(Pago nuevoPago)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {
-    var query = $@"INSERT INTO pago ({nameof(Pago.Id_contrato)},{nameof(Pago.Detalle)},{nameof(Pago.Fecha_pago)},{nameof(Pago.Monto)},{nameof(Pago.Estado)})
-                VALUES (@Id_contrato,@Detalle, @Fecha_pago, @Monto,@Estado)";
+    var query = $@"INSERT INTO pago ({nameof(Pago.Id_contrato)},{nameof(Pago.Detalle)},{nameof(Pago.Fecha_pago)},{nameof(Pago.Monto)},{nameof(Pago.Estado)},{nameof(Pago.Create_user)})
+                VALUES (@Id_contrato,@Detalle, @Fecha_pago, @Monto,@Estado,@Create_user)";
      using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@Id_contrato", nuevoPago.Id_contrato);
@@ -303,6 +341,7 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
             command.Parameters.AddWithValue("@Fecha_pago", nuevoPago.Fecha_pago);
             command.Parameters.AddWithValue("@Monto", nuevoPago.Monto);
             command.Parameters.AddWithValue("@Estado", true);
+            command.Parameters.AddWithValue("@Create_user", nuevoPago.Create_user);
             connection.Open();
             command.ExecuteNonQuery(); // Ejecuta la consulta de inserción
             connection.Close();
@@ -529,11 +568,15 @@ public void ActualizarContratoFechaTerminacion(Contrato actualizarContrato)
     {
         var query = $@"UPDATE contrato 
                SET 
-                   {nameof(Contrato.FechaTerminacion)} = @FechaTerminacion 
+                   {nameof(Contrato.FechaTerminacion)} = @FechaTerminacion,
+                   {nameof(Contrato.Terminate_user)} = @Terminate_user,
+                   {nameof(Contrato.Estado)} = @Estado
                WHERE Id_contrato = @Id";
  using(MySqlCommand command = new MySqlCommand(query, connection))
         {
             command.Parameters.AddWithValue("@FechaTerminacion", actualizarContrato.FechaTerminacionAnticipada);
+            command.Parameters.AddWithValue("@Terminate_user", actualizarContrato.Terminate_user);
+            command.Parameters.AddWithValue("@Estado", false);
             command.Parameters.AddWithValue("@Id", actualizarContrato.Id_contrato);
             connection.Open();
             command.ExecuteNonQuery(); 

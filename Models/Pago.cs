@@ -7,6 +7,8 @@ public string Detalle {get;set;} = "";
 public DateTime Fecha_pago {get;set;}
 public decimal Monto {get;set;}
 public decimal MontoTotalApagar {get;set;}
+public string Create_user {get;set;} = "";
+public string Anulado_user {get;set;} = "";
 public bool Estado {get;set;} = false;
     
 }

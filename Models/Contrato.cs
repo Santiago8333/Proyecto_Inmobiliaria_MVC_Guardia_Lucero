@@ -18,4 +18,6 @@ public class Contrato{
      public int Meses {get;set;}
      public bool Estado {get;set;} = false;
      public bool Contrato_Completado {get;set;} = false;
+     public string Create_user {get;set;} = "";
+     public string Terminate_user {get;set;} = "";
 }

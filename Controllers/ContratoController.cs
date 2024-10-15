@@ -108,6 +108,15 @@ public IActionResult TerminarContrato(int id)
     }
     // Registrar la terminación anticipada
     contrato.FechaTerminacionAnticipada = fechaTerminacion;
+    if (User?.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+    {
+        contrato.Terminate_user = User.Identity.Name;
+    }
+    else
+    {
+        // Asigna un valor predeterminado si el nombre de usuario no está disponible
+        contrato.Terminate_user = "Unknown User"; 
+    }
     repo.ActualizarContratoFechaTerminacion(contrato);
 
     // Registrar la multa como un pago
@@ -115,7 +124,7 @@ public IActionResult TerminarContrato(int id)
     TempData["Mensaje"] = $"Contrato terminado anticipadamente. Multa registrada: {multa:C}.";
 
     
-    return RedirectToAction("Detalles", new { id = contrato.Id_contrato });
+    return RedirectToAction("index");
 }
 public int ObtenerMesesAdeudados(Contrato contrato)
 {
@@ -180,7 +189,15 @@ public IActionResult Agregar(Contrato nuevoContrato)
         if(contrato == null){
             nuevoContrato.Monto_Pagar = nuevoContrato.Monto;
             nuevoContrato.FechaTerminacion = nuevoContrato.Fecha_hasta;
-            repo.AgregarContrato(nuevoContrato);
+        if (User?.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+        {
+            nuevoContrato.Create_user = User.Identity.Name;
+        }
+        else
+        {
+            nuevoContrato.Create_user = "Unknown User"; 
+        }
+        repo.AgregarContrato(nuevoContrato);
         TempData["Mensaje"] = "Contrato agregado exitosamente.";
         return RedirectToAction("Index");
         }else{
@@ -343,6 +360,15 @@ public IActionResult AgregarPago(Pago nuevoPago)
     // Actualizar el contrato en la base de datos
     repo.ActualizarContratoMontoPagar(contrato);
     // Agregar el nuevo pago
+    if (User?.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+    {
+        nuevoPago.Create_user = User.Identity.Name;
+    }
+    else
+    {
+        // Asigna un valor predeterminado si el nombre de usuario no está disponible
+        nuevoPago.Create_user = "Unknown User"; 
+    }
     repo.AgregarPago(nuevoPago);
     //veririficar si se pago todo el contrato
     var pagosActivos = repo.ObtenerPagoActivosDelContrato(contrato.Id_contrato);
@@ -402,6 +428,7 @@ if (mesesApagar > 0)
         TempData["Mensaje"] = "Pago eliminado.";
         return RedirectToAction("Index");
 }
+/*
 public IActionResult PagoEdicion(int id)
 {
     if (id == 0)
@@ -421,6 +448,8 @@ public IActionResult PagoEdicion(int id)
         return View(pago);
     }
 }
+*/
+/*
 [HttpPost]
 public IActionResult ActualizarPago(Pago actualizarPago)
 {
@@ -486,6 +515,7 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "Hubo un error al Modificar el Pago.";
 return RedirectToAction("Index");
 }
+*/
 [HttpPost]
 public IActionResult Renovar(Contrato contratoRenovado)
 {

@@ -17,6 +17,11 @@
   <thead>
     <tr>
         <th>#</th>
+        @if (User.IsInRole("Administrador"))
+				{
+          <th>Creado Por</th>
+          <th>Anulado Por</th>
+        }
         <th>Fecha del pago</th>
         <th>Monto</th>
         <th>Detalle</th>
@@ -41,6 +46,15 @@
         <td>
           @contador
         </td>
+        @if (User.IsInRole("Administrador"))
+				{
+        <td>
+          @item.Create_user
+        </td>
+        <td>
+          @item.Anulado_user
+        </td>
+        }
         <td>
 					@item.Fecha_pago.ToString("dd-MM-yyyy")
 				</td>
@@ -67,6 +81,15 @@
         <td>
           @contador
         </td>
+        @if (User.IsInRole("Administrador"))
+				{
+        <td>
+          @item.Create_user
+        </td>
+        <td>
+          @item.Anulado_user
+        </td>
+        }
         <td>
 					@item.Fecha_pago.ToString("dd-MM-yyyy")
 				</td>
@@ -91,6 +114,11 @@
             <td><strong>Monto Total Pagado: </strong>@sumapagos</td>
             <td><strong>Meses que hay que pagar: </strong>@Meses</td>
             <td><strong>Meses adeudados: </strong>@MesesDeuda</td>
+            @if (User.IsInRole("Administrador"))
+				    {
+            <td></td>
+            <td></td>
+            }
         </tr>
   </tbody>
 </table>
@@ -170,7 +198,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ¿Estás seguro de que deseas eliminar este Pago?
+        ¿Estás seguro de que deseas Anular este Pago?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

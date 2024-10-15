@@ -5,6 +5,17 @@
 }
 <h1>Detalle Contrato</h1>
 <form >
+    @if (User.IsInRole("Administrador"))
+	{
+    <div class="mb-3">
+        <label for="Create_user" class="form-label">Contrato Creado Por</label>
+        <input type="text" class="form-control" id="Create_user" name="Create_user" value="@Model.Create_user" readonly/>
+    </div>
+    <div class="mb-3">
+        <label for="Terminate_user" class="form-label">Contrato Terminado Por</label>
+        <input type="text" class="form-control" id="Terminate_user" name="Terminate_user" value="@Model.Terminate_user" readonly/>
+    </div>
+    }
      <div class="mb-3">
         <label for="Emailinquilino" class="form-label">Email del inquilino</label>
         <input type="text" class="form-control" id="Emailinquilino" name="Emailinquilino" value="@Model.Emailinquilino" readonly/>
