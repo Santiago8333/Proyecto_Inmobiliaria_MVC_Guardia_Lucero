@@ -16,6 +16,7 @@ public class InmueblesController : Controller
         repo = new RepositorioInmuebles();
         repo2 = new RepositorioPropietario();
     }
+    /*
  public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
     {
         var inmueblesQueryable = repo.ObtenerTodos().AsQueryable();
@@ -30,20 +31,33 @@ public class InmueblesController : Controller
 
         return View(viewModel);
     }
- public async Task<IActionResult> Suspendidos(int pageNumber = 1, int pageSize = 5)
+    */
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string estadoFiltro = "Todos")
+{
+    var inmueblesQueryable = repo.ObtenerTodos().AsQueryable();
+
+    // Aplicar el filtro según el estado
+    if (estadoFiltro == "Activos")
     {
-        var inmueblesQueryable = repo.ObtenerTodosDesactivados().AsQueryable();
-        var paginacion = await Paginacion<Inmuebles>.CrearPaginacion(inmueblesQueryable, pageNumber, pageSize);
-        var propietarios = repo2.ObtenerTodos();
-
-        var viewModel = new InmueblesPropietariosViewModel
-        {
-            InmueblesPaginados = paginacion,
-            Propietarios = propietarios
-        };
-
-        return View(viewModel);
+        inmueblesQueryable = inmueblesQueryable.Where(i => i.Estado == true);
     }
+    else if (estadoFiltro == "Suspendidos")
+    {
+        inmueblesQueryable = inmueblesQueryable.Where(i => i.Estado == false);
+    }
+
+    var paginacion = await Paginacion<Inmuebles>.CrearPaginacion(inmueblesQueryable, pageNumber, pageSize);
+    var propietarios = repo2.ObtenerTodos();
+    
+    var viewModel = new InmueblesPropietariosViewModel
+    {
+        InmueblesPaginados = paginacion,
+        Propietarios = propietarios,
+        EstadoFiltro = estadoFiltro
+    };
+
+    return View(viewModel);
+}
 [HttpPost]
 public IActionResult Agregar(Inmuebles nuevoInmuebles)
 {
@@ -56,20 +70,6 @@ if (ModelState.IsValid)
     TempData["Mensaje"] = "Hubo un error al agregar el Inmueble.";
     return RedirectToAction("Index");
 }
-/*
-public IActionResult Eliminar(int id)
-{
-    var Inmuebles = repo.ObtenerPorID(id);
-    if (Inmuebles == null)
-        {
-            TempData["Mensaje"] = "Inmueble no encontrado.";
-            return RedirectToAction("Index");
-        }
-        repo.EliminarInmuebles(id);
-        TempData["Mensaje"] = "Inmueble eliminado.";
-        return RedirectToAction("Index");
-}
-*/
 public IActionResult Suspender(int id)
 {
     var Inmuebles = repo.ObtenerPorID(id);
@@ -122,7 +122,7 @@ public IActionResult Actualizar(Inmuebles actualizarInmueble)
 if (ModelState.IsValid)
     {
         //actualizar Monto en el contrato si tiene
-        repo.ActualizarContratoMonto(actualizarInmueble);
+        //repo.ActualizarContratoMonto(actualizarInmueble);
         //actualizar
         repo.ActualizarInmueble(actualizarInmueble);
         TempData["Mensaje"] = "Inmueble Modificado correctamente.";

@@ -12,11 +12,22 @@ public class RepositorioInmuebles{
         List<Inmuebles> inmuebles = new List<Inmuebles>();
     using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
-            var query = $@"SELECT {nameof(Inmuebles.Id_inmueble)},{nameof(Inmuebles.Uso)},{nameof(Inmuebles.Tipo)},{nameof(Inmuebles.Ambiente)},{nameof(Inmuebles.Precio)},{nameof(Inmuebles.Direccion)},p.Nombre AS NombrePropietario,p.Email AS EmailPropietario
-                      FROM inmuebles i
-                      JOIN 
-                        propietarios p ON p.Id_propietarios = i.Id_propietario
-                      WHERE i.Estado = true";
+            var query = $@"SELECT
+                        i.{ nameof(Inmuebles.Id_inmueble) },
+                        i.{ nameof(Inmuebles.Uso) },
+                        i.{ nameof(Inmuebles.Tipo) },
+                        i.{ nameof(Inmuebles.Ambiente) },
+                        i.{ nameof(Inmuebles.Precio) },
+                        i.{ nameof(Inmuebles.Direccion) },
+                        i.{ nameof(Inmuebles.Estado) },
+                        p.Nombre AS NombrePropietario,
+                        p.Email AS EmailPropietario
+                    FROM
+                        inmuebles i
+                    JOIN propietarios p ON
+                        p.Id_propietarios = i.Id_propietario
+                    WHERE
+                        1";
         using(MySqlCommand command = new MySqlCommand(query, connection))
 			{
                 connection.Open();
@@ -30,7 +41,53 @@ public class RepositorioInmuebles{
                         Tipo = reader.GetString(nameof(Inmuebles.Tipo)),
                         Ambiente = reader.GetString(nameof(Inmuebles.Ambiente)),
                         Precio = reader.GetInt32(nameof(Inmuebles.Precio)),
-                         Direccion = reader.GetString(nameof(Inmuebles.Direccion)),
+                        Direccion = reader.GetString(nameof(Inmuebles.Direccion)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Inmuebles.Estado))),
+                        NombrePropietario = reader.GetString("NombrePropietario"),
+                        EmailPropietario = reader.GetString("EmailPropietario"),
+					});
+				}
+                connection.Close();
+            }
+            return inmuebles;
+        }
+    }
+    public List<Inmuebles> ObtenerTodosActivos()
+	{
+        List<Inmuebles> inmuebles = new List<Inmuebles>();
+    using(MySqlConnection connection = new MySqlConnection(ConectionString))
+		{
+            var query = $@"SELECT
+                        i.{ nameof(Inmuebles.Id_inmueble) },
+                        i.{ nameof(Inmuebles.Uso) },
+                        i.{ nameof(Inmuebles.Tipo) },
+                        i.{ nameof(Inmuebles.Ambiente) },
+                        i.{ nameof(Inmuebles.Precio) },
+                        i.{ nameof(Inmuebles.Direccion) },
+                        i.{ nameof(Inmuebles.Estado) },
+                        p.Nombre AS NombrePropietario,
+                        p.Email AS EmailPropietario
+                    FROM
+                        inmuebles i
+                    JOIN propietarios p ON
+                        p.Id_propietarios = i.Id_propietario
+                    WHERE
+                        i.Estado = true";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+			{
+                connection.Open();
+				var reader = command.ExecuteReader();
+                while (reader.Read())
+				{
+					inmuebles.Add(new Inmuebles
+					{
+						Id_inmueble = reader.GetInt32(nameof(Inmuebles.Id_inmueble)),
+                        Uso = reader.GetString(nameof(Inmuebles.Uso)),
+                        Tipo = reader.GetString(nameof(Inmuebles.Tipo)),
+                        Ambiente = reader.GetString(nameof(Inmuebles.Ambiente)),
+                        Precio = reader.GetInt32(nameof(Inmuebles.Precio)),
+                        Direccion = reader.GetString(nameof(Inmuebles.Direccion)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Inmuebles.Estado))),
                         NombrePropietario = reader.GetString("NombrePropietario"),
                         EmailPropietario = reader.GetString("EmailPropietario"),
 					});

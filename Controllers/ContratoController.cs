@@ -27,7 +27,7 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
     var paginacion = await Paginacion<Contrato>.CrearPaginacion(contratosQueryable, pageNumber, pageSize);
     var inquilinos = repo2.ObtenerTodos();
     ViewBag.Inquilinos = inquilinos;
-    var inmuebles = repo3.ObtenerTodos();
+    var inmuebles = repo3.ObtenerTodosActivos();
     ViewBag.Inmuebles = inmuebles;
     return View(paginacion);
 }
@@ -299,6 +299,10 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     var pagos = repo.ObtenerPagoDelContrato(id);
     //suma de de los pagos
     var sumpagos = pagos.Where(p => p.Estado == true).Sum(p => p.Monto);
+    // Calcular el número de pagos activos
+    var pagosActivos = pagos.Where(p => p.Estado == true).Count();
+    // Calcular los meses faltan por pagar
+    var mesesRestantes = contrato.Meses - pagosActivos;
     //caclular monto que falta pagar
     var MontoQueFaltaPagar =  contrato.Monto_total - sumpagos;
     // Si no hay pagos, permitimos que la vista se muestre vacía
@@ -322,6 +326,7 @@ public async Task<IActionResult> Pago(int id, int pageNumber = 1, int pageSize =
     ViewBag.Meses = contrato.Meses;
     ViewBag.fechaInicio = fechaInicio;
     ViewBag.Multas = multas;
+    ViewBag.mesesRestantes = mesesRestantes;
     return View(paginacion);
 }
 [HttpPost]
@@ -400,7 +405,17 @@ public IActionResult EliminarPago(int id)
             TempData["Mensaje"] = "Pago no encontrado.";
             return RedirectToAction("Index");
         }
-        repo.EliminarPago(id);
+        var username = "";
+        if (User?.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+        {
+            username = User.Identity.Name;
+        }
+        else
+        {
+            // Asigna un valor predeterminado si el nombre de usuario no está disponible
+            username = "Unknown User"; 
+        }
+        repo.EliminarPago(id,username);
         //obvtener contrato
         var contrato = repo.ObtenerPorID(pago.Id_contrato);
         if(contrato == null){
@@ -428,94 +443,6 @@ if (mesesApagar > 0)
         TempData["Mensaje"] = "Pago eliminado.";
         return RedirectToAction("Index");
 }
-/*
-public IActionResult PagoEdicion(int id)
-{
-    if (id == 0)
-    {
-        TempData["Mensaje"] = "Pago no encontrado.";
-        return RedirectToAction("Index");
-    }
-    else
-    {
-          var pago = repo.ObtenerPagoPorID(id);
-        if (pago == null)
-        {
-            TempData["Mensaje"] = "Pago no encontrado.";
-            return RedirectToAction("Index");
-        }
-
-        return View(pago);
-    }
-}
-*/
-/*
-[HttpPost]
-public IActionResult ActualizarPago(Pago actualizarPago)
-{
-if (ModelState.IsValid)
-    {
-        var pago = repo.ObtenerPagoPorID(actualizarPago.Id_pago);
-        var pagos = repo.ObtenerPagoDelContrato(actualizarPago.Id_contrato);
-        var contrato = repo.ObtenerPorID(actualizarPago.Id_contrato);
-        var sumpagos = pagos.Sum(p => p.Monto);
-        //verificar si el pago exsiste
-        if (pago == null)
-        {
-            TempData["Mensaje"] = "Pago no encontrado.";
-            return RedirectToAction("Index");
-        }
-        //verificar si el contrato exsiste 
-        if (contrato == null)
-        {
-            TempData["Mensaje"] = "Contrato no encontrado.";
-            return RedirectToAction("Index");
-        }
-        //veirificar pago
-        // Verificar monto de pago (El monto que queda por pagar)
-        var realmonto = contrato.Monto_Pagar;
-        var realmonto2 = actualizarPago.Monto - pago.Monto;
-        var realmonto3 = Math.Abs(realmonto2);
-        if(realmonto2 < 0){
-            realmonto = contrato.Monto;
-        }
-        if (realmonto3 > realmonto)
-        {
-          
-            TempData["Mensaje"] = $"El monto ingresado ({actualizarPago.Monto}) excede lo que falta por pagar ({contrato.Monto_Pagar}).";
-            return RedirectToAction("Index");
-        }
-        if (actualizarPago.Monto <= 0)
-        {
-            TempData["Mensaje"] = "El monto del pago debe ser mayor a cero.";
-            return RedirectToAction("Index");
-        }
-        
-        // Verificación del rango de fechas
-        if (actualizarPago.Fecha_pago < contrato.Fecha_desde || actualizarPago.Fecha_pago > contrato.Fecha_hasta)
-        {
-            TempData["Mensaje"] = "La fecha del pago está fuera del rango permitido por el contrato.";
-            return RedirectToAction("Index");
-        }
-       // Calcular la diferencia entre el monto actual y el monto a actualizar
-        var diferenciaMonto = actualizarPago.Monto - pago.Monto;
-
-        // Si la diferencia es positiva (el nuevo pago es mayor), restamos esa diferencia al monto total del contrato
-        // Si la diferencia es negativa (el nuevo pago es menor), sumamos la diferencia al monto total del contrato
-        contrato.Monto_Pagar -= diferenciaMonto;
-
-        // Actualizar el contrato en la base de datos
-        repo.ActualizarContratoMontoPagar(contrato);
-
-
-        repo.ActualizarPago(actualizarPago);
-        TempData["Mensaje"] = "Pago Modificado correctamente.";
-        return RedirectToAction("Index");
-    }
-TempData["Mensaje"] = "Hubo un error al Modificar el Pago.";
-return RedirectToAction("Index");
-}
-*/
 [HttpPost]
 public IActionResult Renovar(Contrato contratoRenovado)
 {

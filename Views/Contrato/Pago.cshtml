@@ -9,6 +9,7 @@
     DateTime fechaInicio = ViewBag.fechaInicio;
     decimal TotalAPagar = ViewBag.TotalAPagar;
     var Multas = ViewBag.Multas;
+    int mesesRestantes = ViewBag.mesesRestantes;
 }
 <div class="text-center">
 	<h1 class="display-4">Pagos Asocaidos al Contratos</h1>
@@ -32,16 +33,11 @@
   <tbody>
      @{
       int contador = 0; // Variable para numerar las filas
-      int MesesPagados = 0;
-      int MesesDeuda = 0;
       }
     @foreach (var item in Model)
 		{
       contador += 1;
       if(@item.Estado){
-        //numero de meses pagados
-        MesesPagados += 1;
-        MesesDeuda = Meses - MesesPagados;
         <tr>
         <td>
           @contador
@@ -113,7 +109,7 @@
             <td><strong>Monto que falta pagar: </strong>@MontoQueFaltaPagar</td>
             <td><strong>Monto Total Pagado: </strong>@sumapagos</td>
             <td><strong>Meses que hay que pagar: </strong>@Meses</td>
-            <td><strong>Meses adeudados: </strong>@MesesDeuda</td>
+            <td><strong>Meses adeudados: </strong>@mesesRestantes</td>
             @if (User.IsInRole("Administrador"))
 				    {
             <td></td>

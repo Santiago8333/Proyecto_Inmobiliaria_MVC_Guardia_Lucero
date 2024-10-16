@@ -390,15 +390,17 @@ public void ActualizarContratoMontoPagar(Contrato contrato)
     }
 }
 
-public void EliminarPago(int id)
+public void EliminarPago(int id,string username)
 {
 using(MySqlConnection connection = new MySqlConnection(ConectionString))
     {        var query = $@"UPDATE pago 
-                       SET {nameof(Pago.Estado)} = @Estado
+                       SET {nameof(Pago.Estado)} = @Estado,
+                       {nameof(Pago.Anulado_user)} = @Anulado_user
                        WHERE Id_pago = @Id";
 using(MySqlCommand command = new MySqlCommand(query, connection))
         {
-            command.Parameters.AddWithValue("@Estado", false); 
+            command.Parameters.AddWithValue("@Estado", false);
+            command.Parameters.AddWithValue("@Anulado_user", username); 
 			command.Parameters.AddWithValue("@Id", id);
             connection.Open();
             command.ExecuteNonQuery();
