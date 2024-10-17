@@ -155,25 +155,6 @@ public void AgregarInmuebles(Inmuebles nuevoInmuebles)
         }
     }
 }
-/*
-public void EliminarInmuebles(int id)
-{
-using (MySqlConnection connection = new MySqlConnection(ConectionString))
-    {
-		
-        var query = $@"DELETE FROM inmuebles
-                       WHERE Id_inmueble = @Id AND Estado = 1";
-
- 		using(MySqlCommand command = new MySqlCommand(query, connection))
-        {
-			command.Parameters.AddWithValue("@Id", id);
-            connection.Open();
-            command.ExecuteNonQuery();
-            connection.Close();
-        }
-	}
-}
-*/
 public void SuspenderInmuebles(int id)
 {
 using (MySqlConnection connection = new MySqlConnection(ConectionString))

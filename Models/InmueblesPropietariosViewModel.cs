@@ -8,4 +8,5 @@ public class InmueblesPropietariosViewModel
     public Paginacion<Inmuebles>? InmueblesPaginados { get; set; }
     public IEnumerable<Propietario>? Propietarios { get; set; }
     public string EstadoFiltro { get; set; } = "";
+    public string EmailPropietarioFiltro { get; set; } = "";
 }

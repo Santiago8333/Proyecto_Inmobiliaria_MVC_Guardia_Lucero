@@ -20,7 +20,7 @@ public class ContratoController : Controller
         repo2 = new RepositorioInquilinos();
         repo3 = new RepositorioInmuebles();
     }
-
+/*
 public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
 {
     var contratosQueryable = repo.ObtenerTodos().AsQueryable();
@@ -29,6 +29,38 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
     ViewBag.Inquilinos = inquilinos;
     var inmuebles = repo3.ObtenerTodosActivos();
     ViewBag.Inmuebles = inmuebles;
+    return View(paginacion);
+}
+*/
+public async Task<IActionResult> Index(DateTime? Fecha_desde, DateTime? Fecha_hasta, int pageNumber = 1, int pageSize = 5)
+{
+    var contratosQueryable = repo.ObtenerTodos().AsQueryable();
+
+    // Aplicar filtro por fecha desde
+    if (Fecha_desde.HasValue)
+    {
+        contratosQueryable = contratosQueryable.Where(c => c.Fecha_desde >= Fecha_desde.Value);
+    }
+
+    // Aplicar filtro por fecha hasta
+    if (Fecha_hasta.HasValue)
+    {
+        contratosQueryable = contratosQueryable.Where(c => c.Fecha_hasta <= Fecha_hasta.Value);
+    }
+
+    // Paginación
+    var paginacion = await Paginacion<Contrato>.CrearPaginacion(contratosQueryable, pageNumber, pageSize);
+
+    // Obtener inquilinos e inmuebles
+    var inquilinos = repo2.ObtenerTodos();
+    ViewBag.Inquilinos = inquilinos;
+    var inmuebles = repo3.ObtenerTodosActivos();
+    ViewBag.Inmuebles = inmuebles;
+
+    // Pasar los filtros de fechas a la vista (si es necesario)
+    ViewBag.FechaDesdeFiltro = Fecha_desde;
+    ViewBag.FechaHastaFiltro = Fecha_hasta;
+
     return View(paginacion);
 }
 public IActionResult Detalle(int id)

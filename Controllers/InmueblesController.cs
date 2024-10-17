@@ -32,7 +32,7 @@ public class InmueblesController : Controller
         return View(viewModel);
     }
     */
-public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string estadoFiltro = "Todos")
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string estadoFiltro = "Todos",string EmailPropietario = "Todos")
 {
     var inmueblesQueryable = repo.ObtenerTodos().AsQueryable();
 
@@ -45,7 +45,11 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, str
     {
         inmueblesQueryable = inmueblesQueryable.Where(i => i.Estado == false);
     }
-
+    //aplicar filtro por email
+    if (EmailPropietario != "Todos")
+    {
+        inmueblesQueryable = inmueblesQueryable.Where(i => i.EmailPropietario == EmailPropietario);
+    }
     var paginacion = await Paginacion<Inmuebles>.CrearPaginacion(inmueblesQueryable, pageNumber, pageSize);
     var propietarios = repo2.ObtenerTodos();
     
@@ -53,7 +57,8 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, str
     {
         InmueblesPaginados = paginacion,
         Propietarios = propietarios,
-        EstadoFiltro = estadoFiltro
+        EstadoFiltro = estadoFiltro,
+        EmailPropietarioFiltro = EmailPropietario
     };
 
     return View(viewModel);
