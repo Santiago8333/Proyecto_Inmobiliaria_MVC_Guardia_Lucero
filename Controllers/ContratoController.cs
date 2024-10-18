@@ -32,14 +32,16 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
     return View(paginacion);
 }
 */
-public async Task<IActionResult> Index(DateTime? Fecha_desde, DateTime? Fecha_hasta, int pageNumber = 1, int pageSize = 5)
+public async Task<IActionResult> Index(DateTime? Fecha_desde, DateTime? Fecha_hasta,string direccion = "Todos",int plazo = 0,int pageNumber = 1, int pageSize = 5)
 {
     var contratosQueryable = repo.ObtenerTodos().AsQueryable();
-
+    var contratosOption = contratosQueryable;
     // Aplicar filtro por fecha desde
     if (Fecha_desde.HasValue)
     {
         contratosQueryable = contratosQueryable.Where(c => c.Fecha_desde >= Fecha_desde.Value);
+        //filtrar contratos activos
+        contratosQueryable = contratosQueryable.Where(i => i.Estado == true);
     }
 
     // Aplicar filtro por fecha hasta
@@ -47,7 +49,20 @@ public async Task<IActionResult> Index(DateTime? Fecha_desde, DateTime? Fecha_ha
     {
         contratosQueryable = contratosQueryable.Where(c => c.Fecha_hasta <= Fecha_hasta.Value);
     }
+    //aplicar filtro de contratos que tengan un inmueble de cierta direccion
+    if(direccion != "Todos")
+    {
+        contratosQueryable = contratosQueryable.Where(c => c.Inmuebledireccion == direccion);
+    } 
+    //apiclar filtro de duracion del contrato
+    if (plazo > 0)
+    {
+        // Calcular la fecha límite según el plazo (hoy + plazo en días)
+        var fechaLimite = DateTime.Now.AddDays(plazo);
 
+        // Filtrar los contratos cuya fecha de fin esté dentro del plazo seleccionado
+        contratosQueryable = contratosQueryable.Where(c => c.Fecha_hasta <= fechaLimite && c.Fecha_hasta >= DateTime.Now);
+    }
     // Paginación
     var paginacion = await Paginacion<Contrato>.CrearPaginacion(contratosQueryable, pageNumber, pageSize);
 
@@ -60,6 +75,7 @@ public async Task<IActionResult> Index(DateTime? Fecha_desde, DateTime? Fecha_ha
     // Pasar los filtros de fechas a la vista (si es necesario)
     ViewBag.FechaDesdeFiltro = Fecha_desde;
     ViewBag.FechaHastaFiltro = Fecha_hasta;
+    ViewBag.contratosOption = contratosOption;
 
     return View(paginacion);
 }

@@ -28,6 +28,7 @@ public List<Contrato> ObtenerTodos()
                 c.Terminate_user,
                 inq.Email AS Emailinquilino,
                 i.Tipo AS Inmuebletipo,
+                i.Direccion,
                 pro.Email AS EmailPropietario
             FROM
                 contrato c
@@ -59,6 +60,7 @@ public List<Contrato> ObtenerTodos()
                     Contrato_Completado = reader.GetBoolean(reader.GetOrdinal("Contrato_Completado")),
                     Create_user = reader.GetString("Create_user"),
                     Terminate_user = reader.GetString("Terminate_user"),
+                    Inmuebledireccion = reader.GetString("Direccion"),
                 });
             }
             connection.Close();
