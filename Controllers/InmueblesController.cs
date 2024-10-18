@@ -10,11 +10,13 @@ public class InmueblesController : Controller
       private readonly ILogger<InmueblesController> _logger;
       private RepositorioInmuebles repo;
       private RepositorioPropietario repo2;
+      private RepositorioContrato repo3;
  public InmueblesController(ILogger<InmueblesController> logger)
     {
         _logger = logger;
         repo = new RepositorioInmuebles();
         repo2 = new RepositorioPropietario();
+        repo3 = new RepositorioContrato();
     }
     /*
  public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
@@ -32,7 +34,7 @@ public class InmueblesController : Controller
         return View(viewModel);
     }
     */
-public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string estadoFiltro = "Todos",string EmailPropietario = "Todos")
+public async Task<IActionResult> Index(DateTime? FechaInicio, DateTime? FechaFin,int pageNumber = 1, int pageSize = 5, string estadoFiltro = "Todos",string EmailPropietario = "Todos")
 {
     var inmueblesQueryable = repo.ObtenerTodos().AsQueryable();
 
@@ -50,9 +52,27 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, str
     {
         inmueblesQueryable = inmueblesQueryable.Where(i => i.EmailPropietario == EmailPropietario);
     }
+// Filtrar inmuebles que estén disponibles en el rango de fechas si ambas fechas son válidas
+    if (FechaInicio.HasValue && FechaFin.HasValue)
+    {
+        // Obtener todos los contratos que se solapen con las fechas seleccionadas
+        var contratosOcupados = repo3.ObtenerTodos().Where(c =>
+            c.Fecha_desde <= FechaFin && c.Fecha_hasta >= FechaInicio
+        ).Select(c => c.Id_inmueble).ToList();
+        /*
+    foreach (var idInmueble in contratosOcupados)
+        {
+            Console.WriteLine("Inmueble ocupado ID: " + idInmueble);
+        }
+        */
+        //Console.WriteLine($"Contratos ocupados encontrados: {contratosOcupados.Count}");
+        // Filtrar los inmuebles que no estén ocupados en ese rango de fechas
+        //Console.WriteLine($"Inmuebles antes del filtrado: {inmueblesQueryable.Count()}");
+        inmueblesQueryable = inmueblesQueryable.Where(i => !contratosOcupados.Contains(i.Id_inmueble));
+        //Console.WriteLine($"Inmuebles disponibles después del filtrado: {inmueblesQueryable.Count()}");
+    }
     var paginacion = await Paginacion<Inmuebles>.CrearPaginacion(inmueblesQueryable, pageNumber, pageSize);
     var propietarios = repo2.ObtenerTodos();
-    
     var viewModel = new InmueblesPropietariosViewModel
     {
         InmueblesPaginados = paginacion,

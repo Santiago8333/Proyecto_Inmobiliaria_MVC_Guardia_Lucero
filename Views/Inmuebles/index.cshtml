@@ -32,7 +32,7 @@
     </div>
     </form>
     </th>
-    <th colspan="7">
+    <th colspan="4">
         <form method="get" action="@Url.Action("Index", "Inmuebles")">
             <label for="propietarioSearch">Buscar Inmueble por el email del Propietario:</label>
             <input list="propietariosList" id="propietarioSearch" name="EmailPropietario" placeholder="Escribe o selecciona un propietario" />
@@ -52,6 +52,17 @@
             </datalist>
             <input type="submit" value="Buscar" class="btn btn-primary" />
         </form>
+    </th>
+    <th colspan="3">
+    <form method="get" action="@Url.Action("Index", "Inmuebles")">
+    <label for="FechaInicio" class="form-label">Fecha de inicio del contrato</label>
+    <input type="date" class="form-control" id="FechaInicio" name="FechaInicio" required />
+
+    <label for="FechaFin" class="form-label">Fecha de fin del contrato</label>
+    <input type="date" class="form-control" id="FechaFin" name="FechaFin" required />
+
+    <input type="submit" value="Filtrar Inmuebles Disponibles" class="btn btn-primary mt-2" />
+    </form>
     </th>
     </tr>
     <tr>
