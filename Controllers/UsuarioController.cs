@@ -504,12 +504,21 @@ if (ModelState.IsValid)
 
             Console.WriteLine("Archivo cargado: " + fileName);
             actualizarUsuario.AvatarUrl = $"/avatars/{newFileName}";
+            actualizarUsuario.Nombre = usuario.Nombre;
+            actualizarUsuario.Apellido = usuario.Apellido;
+            actualizarUsuario.Email = usuario.Email;
+            actualizarUsuario.RolNombre = usuario.RolNombre;
             await ActualizarClaimsYReautenticarAvatar(actualizarUsuario);
         }
         else
         {
             Console.WriteLine("No se subió un archivo de avatar.");
             actualizarUsuario.AvatarUrl = "/avatars/default-avatar.png";  // Asignar avatar por defecto
+            actualizarUsuario.Nombre = usuario.Nombre;
+            actualizarUsuario.Apellido = usuario.Apellido;
+            actualizarUsuario.Email = usuario.Email;
+            actualizarUsuario.RolNombre = usuario.RolNombre;
+            await ActualizarClaimsYReautenticarAvatar(actualizarUsuario);
         }
 // Verificar si tiene una imagen personalizada y no es la imagen por defecto
     if (!string.IsNullOrEmpty(usuario.AvatarUrl) && usuario.AvatarUrl != "/avatars/default-avatar.png")
@@ -568,7 +577,10 @@ private async Task ActualizarClaimsYReautenticarAvatar(Usuario usuarioActualizad
     // Crear una lista de claims actualizada
     var claims = new List<Claim>
     {
+        new Claim(ClaimTypes.Name, usuarioActualizado.Email),
+        new Claim("FullName", usuarioActualizado.Nombre + " " + usuarioActualizado.Apellido),
         new Claim("AvatarUrl", usuarioActualizado.AvatarUrl),
+        new Claim(ClaimTypes.Role, usuarioActualizado.RolNombre)
         // Puedes añadir más claims si es necesario
     };
 
