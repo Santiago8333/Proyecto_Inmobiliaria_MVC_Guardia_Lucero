@@ -310,7 +310,8 @@ if (ModelState.IsValid)
         repo.ActualizarUsuario(actualizarUsuario);
         
         if(usuario.Email == @User.Identity.Name){
-            await ActualizarClaimsYReautenticar(actualizarUsuario);
+            
+            await ActualizarClaimsYReautenticarEdicion(actualizarUsuario);
             //Console.WriteLine("ClaimTypes.Name IN: "+@User.Identity.Name);
         }
         
@@ -356,6 +357,7 @@ if (ModelState.IsValid)
         
         if(usuario.Email == @User.Identity.Name){
             actualizarUsuario.RolNombre = usuario.RolNombre;
+            actualizarUsuario.AvatarUrl = usuario.AvatarUrl;
             await ActualizarClaimsYReautenticar(actualizarUsuario);
             //Console.WriteLine("ClaimTypes.Name IN: "+@User.Identity.Name);
         }
@@ -502,6 +504,7 @@ if (ModelState.IsValid)
 
             Console.WriteLine("Archivo cargado: " + fileName);
             actualizarUsuario.AvatarUrl = $"/avatars/{newFileName}";
+            await ActualizarClaimsYReautenticarAvatar(actualizarUsuario);
         }
         else
         {
@@ -545,6 +548,7 @@ private async Task ActualizarClaimsYReautenticar(Usuario usuarioActualizado)
     {
         new Claim(ClaimTypes.Name, usuarioActualizado.Email),
         new Claim("FullName", usuarioActualizado.Nombre + " " + usuarioActualizado.Apellido),
+        new Claim("AvatarUrl", usuarioActualizado.AvatarUrl),
         new Claim(ClaimTypes.Role, usuarioActualizado.RolNombre) // El rol actualizado
         // Puedes añadir más claims si es necesario
     };
@@ -559,5 +563,44 @@ private async Task ActualizarClaimsYReautenticar(Usuario usuarioActualizado)
     await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 }
+private async Task ActualizarClaimsYReautenticarAvatar(Usuario usuarioActualizado)
+{
+    // Crear una lista de claims actualizada
+    var claims = new List<Claim>
+    {
+        new Claim("AvatarUrl", usuarioActualizado.AvatarUrl),
+        // Puedes añadir más claims si es necesario
+    };
 
+    // Crear una nueva identidad de usuario con las claims actualizadas
+    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+    // Crear un nuevo principal
+    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+    // Re-autenticar al usuario actualizando su cookie de autenticación
+    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+}
+private async Task ActualizarClaimsYReautenticarEdicion(Usuario usuarioActualizado)
+{
+    // Crear una lista de claims actualizada
+    var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, usuarioActualizado.Email),
+        new Claim("FullName", usuarioActualizado.Nombre + " " + usuarioActualizado.Apellido),
+        new Claim(ClaimTypes.Role, usuarioActualizado.RolNombre) // El rol actualizado
+        // Puedes añadir más claims si es necesario
+    };
+
+    // Crear una nueva identidad de usuario con las claims actualizadas
+    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+    // Crear un nuevo principal
+    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+    // Re-autenticar al usuario actualizando su cookie de autenticación
+    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+}
 }
