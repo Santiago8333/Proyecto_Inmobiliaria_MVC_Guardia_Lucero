@@ -12,8 +12,8 @@ public class RepositorioPropietario
 		List<Propietario> propietarios = new List<Propietario>();
 		using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
-			var query = $@"SELECT {nameof(Propietario.Id_propietarios)}, {nameof(Propietario.Dni)}, {nameof(Propietario.Apellido)}, {nameof(Propietario.Nombre)}, {nameof(Propietario.Email)}, {nameof(Propietario.Telefono)} 
-                      FROM propietarios WHERE Estado = true";
+			var query = $@"SELECT {nameof(Propietario.Id_propietarios)}, {nameof(Propietario.Dni)}, {nameof(Propietario.Apellido)}, {nameof(Propietario.Nombre)}, {nameof(Propietario.Email)}, {nameof(Propietario.Telefono)}, {nameof(Propietario.Estado)}
+                      FROM propietarios WHERE 1";
 			using(MySqlCommand command = new MySqlCommand(query, connection))
 			{
 				connection.Open();
@@ -27,7 +27,8 @@ public class RepositorioPropietario
                     Apellido = reader.GetString(nameof(Propietario.Apellido)),
                     Nombre = reader.GetString(nameof(Propietario.Nombre)),
                     Email = reader.GetString(nameof(Propietario.Email)),
-                    Telefono = reader.GetString(nameof(Propietario.Telefono))
+                    Telefono = reader.GetString(nameof(Propietario.Telefono)),
+                    Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Propietario.Estado)))
 					});
 				}
 				connection.Close();
@@ -145,5 +146,100 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         }
     }
 
+}
+public Propietario? ObtenerPorID2(int id)
+{
+    Propietario? res = null;
+
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_propietarios, Dni, Apellido, Nombre, Email, Telefono,Estado
+                      FROM propietarios 
+                      WHERE Id_propietarios = @Id AND Estado = false";
+
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+
+            connection.Open();
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Propietario
+                    {
+                        Id_propietarios = reader.GetInt32(nameof(Propietario.Id_propietarios)),
+                        Dni = reader.GetString(nameof(Propietario.Dni)),
+                        Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                        Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                        Email = reader.GetString(nameof(Propietario.Email)),
+                        Telefono = reader.GetString(nameof(Propietario.Telefono)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Propietario.Estado)))
+                    };
+                }
+            }
+        }
+    }
+
+    return res; // Retorna el propietario o null si no se encontró
+}
+public void ActivarPropietarios(int id)
+{
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+		
+        var query = $@"UPDATE propietarios 
+                       SET {nameof(Propietario.Estado)} = @Estado
+                       WHERE Id_propietarios = @Id";
+
+ 		using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Estado", true); 
+			command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+	}
+}
+public Propietario? ObtenerPorEmail(string Email)
+{
+    Propietario? res = null;
+
+    using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_propietarios, Dni, Apellido, Nombre, Email, Telefono,Estado
+                      FROM propietarios 
+                      WHERE Email = @Email";
+
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Email", Email);
+
+            connection.Open();
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Propietario
+                    {
+                        Id_propietarios = reader.GetInt32(nameof(Propietario.Id_propietarios)),
+                        Dni = reader.GetString(nameof(Propietario.Dni)),
+                        Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                        Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                        Email = reader.GetString(nameof(Propietario.Email)),
+                        Telefono = reader.GetString(nameof(Propietario.Telefono)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Propietario.Estado)))
+                    };
+                }
+            }
+        }
+    }
+
+    return res; // Retorna el propietario o null si no se encontró
 }
 }

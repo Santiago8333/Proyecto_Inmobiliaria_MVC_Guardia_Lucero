@@ -24,12 +24,23 @@ private readonly RepositorioUsuario repo;
    
     }
 [Authorize(Policy = "Administrador")]
-public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,string EmailUsuarios = "Todos")
 {
     var UsuarioQueryable = repo.ObtenerTodos().AsQueryable();
+    var listaUsuarios = UsuarioQueryable;
+    //aplicar filtro por email
+    if (EmailUsuarios != "Todos")
+    {
+        UsuarioQueryable = UsuarioQueryable.Where(i => i.Email == EmailUsuarios);
+        TempData["Mensaje"] = "Usuario Buscado: "+EmailUsuarios;
+    }
     var paginacion = await Paginacion<Usuario>.CrearPaginacion(UsuarioQueryable, pageNumber, pageSize);
-
-    return View(paginacion);
+    var viewModel = new UsuariosViewModel
+    {
+        UsuariosPaginados = paginacion,
+        Usuarios = listaUsuarios
+    };
+    return View(viewModel);
 }
 /*
 public IActionResult Index()

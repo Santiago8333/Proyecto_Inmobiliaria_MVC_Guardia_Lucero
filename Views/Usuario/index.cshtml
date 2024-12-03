@@ -1,4 +1,4 @@
-@model Paginacion<Usuario>
+@model UsuariosViewModel
 @{
     ViewData["Title"] = "Usuarios";
     
@@ -7,6 +7,27 @@
 	<h1 class="display-4">Lista de Usuarios</h1>
   <div class="col-md-12">
   </div>
+</div>
+<div class="text-center">
+   <form method="get" action="@Url.Action("Index", "Usuario")">
+    <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Buscar por email..."  list="usuariosList" id="usuariosSearch" name="EmailUsuarios" aria-describedby="button-addon2">
+    <datalist id="usuariosList">
+      @if(Model.Usuarios == null)
+        {
+              <option value="Todos">No hay propietarios</option>
+            }
+            else
+            {
+            @foreach (var Usuarios in Model.Usuarios)
+              {
+                  <option value="@Usuarios.Email">@Usuarios.Email</option>
+              }
+        }
+    </datalist>
+    <button class="btn btn-outline-secondary" type="submit" value="Buscar" id="button-addon2">Buscar</button>
+    </div>
+  </form>
 </div>
 <table class="table table-striped table-hover">
   <thead>
@@ -20,7 +41,9 @@
     </tr>
   </thead>
   <tbody>
-        @foreach (var item in Model)
+  @if (Model.UsuariosPaginados != null && Model.Usuarios != null)
+  {
+        @foreach (var item in Model.UsuariosPaginados)
 		{
 			<tr>
 				<td>
@@ -54,6 +77,7 @@
 				</td>
 			</tr>
 		}
+    }
   </tbody>
 </table>
 <!-- Button trigger modal -->
@@ -115,10 +139,12 @@
 <!-- Paginación -->
 <nav aria-label="Navegación de página">
     <ul class="pagination justify-content-center">
-        @if (Model.PaginasAnteriores)
+        @if (Model.UsuariosPaginados != null && Model.Usuarios != null)
+        {
+        @if (Model.UsuariosPaginados.PaginasAnteriores)
         {
             <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsuariosPaginados.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
                     <span aria-hidden="true">&laquo;</span>
                     <span class="sr-only">Anterior</span>
                 </a>
@@ -132,17 +158,17 @@
             </li>
         }
 
-        @for (int i = 1; i <= Model.PaginasTotales; i++)
+        @for (int i = 1; i <= Model.UsuariosPaginados.PaginasTotales; i++)
         {
-            <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
+            <li class="page-item @(i == Model.UsuariosPaginados.PaginaInicio ? "active" : "")">
                 <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
             </li>
         }
 
-        @if (Model.PaginasPosteriores)
+        @if (Model.UsuariosPaginados.PaginasPosteriores)
         {
             <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.UsuariosPaginados.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">Siguiente</span>
                 </a>
@@ -154,6 +180,7 @@
                 <span class="page-link" aria-hidden="true">&raquo;</span>
                 <span class="sr-only">Siguiente</span>
             </li>
+        }
         }
     </ul>
 </nav>

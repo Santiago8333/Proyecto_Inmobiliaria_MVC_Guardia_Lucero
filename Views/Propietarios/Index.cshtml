@@ -1,10 +1,31 @@
-@model Paginacion<Propietario>
+@model PropietariosViewModel
 @{
     ViewData["Title"] = "Propietarios";
 }
 
 <div class="text-center">
 	<h1 class="display-4">Lista de Propietarios</h1>
+</div>
+<div class="text-center">
+  <form method="get" action="@Url.Action("Index", "Propietarios")">
+    <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Buscar por email..."  list="propietariosList" id="propietarioSearch" name="EmailPropietario" aria-describedby="button-addon2">
+    <datalist id="propietariosList">
+      @if(Model.Propietarios == null)
+        {
+              <option value="Todos">No hay propietarios</option>
+            }
+            else
+            {
+            @foreach (var propietario in Model.Propietarios)
+              {
+                  <option value="@propietario.Email">@propietario.Email</option>
+              }
+        }
+    </datalist>
+    <button class="btn btn-outline-secondary" type="submit" value="Buscar" id="button-addon2">Buscar</button>
+    </div>
+  </form>
 </div>
 <table class="table table-striped table-hover">
   <thead>
@@ -19,8 +40,12 @@
     </tr>
   </thead>
   <tbody>
-        @foreach (var item in Model)
+    @if (Model.PropietariosPaginados != null && Model.Propietarios != null)
+{
+        @foreach (var item in Model.PropietariosPaginados)
 		{
+      @if(item.Estado)
+      {
 			<tr>
 				<td>
 					@Html.DisplayFor(modelItem => item.Id_propietarios)
@@ -55,7 +80,40 @@
                   </a>
 				</td>
 			</tr>
+      }
+      else
+      {
+        <tr class="alert alert-danger" role="alert">
+				<td>
+					@Html.DisplayFor(modelItem => item.Id_propietarios)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Dni)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Apellido)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Nombre)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Email)
+				</td>
+                <td>
+					@Html.DisplayFor(modelItem => item.Telefono)
+				</td>
+                <td>
+                  <a href="javascript:void(0);" 
+                   data-id="@item.Id_propietarios" 
+                   class="btn btn-success"
+                   onclick="confirmActivar(this)">
+                   <i class="fa-solid fa-sync"></i> Reactivar
+                </a>
+				      </td>
+			</tr>
+      }
 		}
+      }
   </tbody>
 </table>
 <!-- Button trigger modal -->
@@ -121,13 +179,33 @@
     </div>
   </div>
 </div>
+<!-- Modal Activar-->
+<div class="modal fade" id="confirmActivarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmar Activacion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas Activar este Propietario?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="confirmActivarButton" href="#" class="btn btn-success">Activar</a>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Paginación -->
 <nav aria-label="Navegación de página">
     <ul class="pagination justify-content-center">
-        @if (Model.PaginasAnteriores)
+      @if (Model.PropietariosPaginados != null && Model.Propietarios != null)
+      {
+        @if (Model.PropietariosPaginados.PaginasAnteriores)
         {
             <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PropietariosPaginados.PaginaInicio - 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Anterior">
                     <span aria-hidden="true">&laquo;</span>
                     <span class="sr-only">Anterior</span>
                 </a>
@@ -141,17 +219,17 @@
             </li>
         }
 
-        @for (int i = 1; i <= Model.PaginasTotales; i++)
+        @for (int i = 1; i <= Model.PropietariosPaginados.PaginasTotales; i++)
         {
-            <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
+            <li class="page-item @(i == Model.PropietariosPaginados.PaginaInicio ? "active" : "")">
                 <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@ViewBag.PageSize">@i</a>
             </li>
         }
 
-        @if (Model.PaginasPosteriores)
+        @if (Model.PropietariosPaginados.PaginasPosteriores)
         {
             <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PropietariosPaginados.PaginaInicio + 1)" asp-route-pageSize="@ViewBag.PageSize" aria-label="Siguiente">
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">Siguiente</span>
                 </a>
@@ -164,6 +242,7 @@
                 <span class="sr-only">Siguiente</span>
             </li>
         }
+      }
     </ul>
 </nav>
 
@@ -197,6 +276,14 @@
         var url = "@Url.Action("Eliminar", "Propietarios")" + "/" + id;
         document.getElementById("confirmDeleteButton").setAttribute("href", url);
         var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        myModal.show();
+    }
+    //reactivar Inmueble
+    function confirmActivar(element) {
+        var id = element.getAttribute("data-id");
+        var url = "@Url.Action("Activar", "Propietarios")" + "/" + id;
+        document.getElementById("confirmActivarButton").setAttribute("href", url);
+        var myModal = new bootstrap.Modal(document.getElementById('confirmActivarModal'));
         myModal.show();
     }
 </script>
