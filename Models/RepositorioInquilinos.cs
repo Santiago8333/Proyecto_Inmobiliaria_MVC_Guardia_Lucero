@@ -12,8 +12,8 @@ public class RepositorioInquilinos
 		List<Inquilinos> inquilinos = new List<Inquilinos>();
 		using(MySqlConnection connection = new MySqlConnection(ConectionString))
 		{
-			var query = $@"SELECT {nameof(Inquilinos.Id_inquilinos)}, {nameof(Inquilinos.Dni)}, {nameof(Inquilinos.Apellido)}, {nameof(Inquilinos.Nombre)}, {nameof(Inquilinos.Email)}, {nameof(Inquilinos.Telefono)}
-                      FROM inquilinos WHERE Estado = true";
+			var query = $@"SELECT {nameof(Inquilinos.Id_inquilinos)}, {nameof(Inquilinos.Dni)}, {nameof(Inquilinos.Apellido)}, {nameof(Inquilinos.Nombre)}, {nameof(Inquilinos.Email)}, {nameof(Inquilinos.Telefono)},{nameof(Propietario.Estado)}
+                      FROM inquilinos WHERE 1";
 			using(MySqlCommand command = new MySqlCommand(query, connection))
 			{
 				connection.Open();
@@ -22,12 +22,13 @@ public class RepositorioInquilinos
 				{
 					inquilinos.Add(new Inquilinos
 					{
-						Id_inquilinos = reader.GetInt32(nameof(Inquilinos.Id_inquilinos)),
+					Id_inquilinos = reader.GetInt32(nameof(Inquilinos.Id_inquilinos)),
                     Dni = reader.GetString(nameof(Inquilinos.Dni)),
                     Apellido = reader.GetString(nameof(Inquilinos.Apellido)),
                     Nombre = reader.GetString(nameof(Inquilinos.Nombre)),
                     Email = reader.GetString(nameof(Inquilinos.Email)),
-                    Telefono = reader.GetString(nameof(Inquilinos.Telefono))
+                    Telefono = reader.GetString(nameof(Inquilinos.Telefono)),
+                    Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Inquilinos.Estado)))
 					});
 				}
 				connection.Close();
@@ -138,5 +139,93 @@ using(MySqlConnection connection = new MySqlConnection(ConectionString))
         }
     }
 
+}
+public Inquilinos? ObtenerPorEmail(string Email)
+{
+    Inquilinos? res = null;
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_inquilinos, Dni, Apellido, Nombre, Email, Telefono , Estado
+                      FROM inquilinos 
+                      WHERE Email = @Email";
+    using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Email", Email);
+
+            connection.Open();
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Inquilinos
+                    {
+                        Id_inquilinos = reader.GetInt32(nameof(Inquilinos.Id_inquilinos)),
+                        Dni = reader.GetString(nameof(Inquilinos.Dni)),
+                        Apellido = reader.GetString(nameof(Inquilinos.Apellido)),
+                        Nombre = reader.GetString(nameof(Inquilinos.Nombre)),
+                        Email = reader.GetString(nameof(Inquilinos.Email)),
+                        Telefono = reader.GetString(nameof(Inquilinos.Telefono)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Inquilinos.Estado)))
+                    };
+                }
+            }
+        }
+    }
+
+return res; // Retorna el propietario o null si no se encontró
+}
+public void ActivarInquilino(int id)
+{
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = $@"UPDATE inquilinos 
+                       SET {nameof(Inquilinos.Estado)} = @Estado
+                       WHERE Id_inquilinos = @Id";
+        using(MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@estado", true);
+            command.Parameters.AddWithValue("@Id", id);
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+
+    }
+}
+public Inquilinos? ObtenerPorID2(int id)
+{
+    Inquilinos? res = null;
+using (MySqlConnection connection = new MySqlConnection(ConectionString))
+    {
+        var query = @"SELECT Id_inquilinos, Dni, Apellido, Nombre, Email, Telefono , Estado
+                      FROM inquilinos 
+                      WHERE Id_inquilinos = @Id AND Estado = false";
+    using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            // Agrega el parámetro id
+            command.Parameters.AddWithValue("@Id", id);
+
+            connection.Open();
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    res = new Inquilinos
+                    {
+                        Id_inquilinos = reader.GetInt32(nameof(Inquilinos.Id_inquilinos)),
+                        Dni = reader.GetString(nameof(Inquilinos.Dni)),
+                        Apellido = reader.GetString(nameof(Inquilinos.Apellido)),
+                        Nombre = reader.GetString(nameof(Inquilinos.Nombre)),
+                        Email = reader.GetString(nameof(Inquilinos.Email)),
+                        Telefono = reader.GetString(nameof(Inquilinos.Telefono)),
+                        Estado = reader.GetBoolean(reader.GetOrdinal(nameof(Inquilinos.Estado)))
+                    };
+                }
+            }
+        }
+    }
+
+return res; // Retorna el propietario o null si no se encontró
 }
 }

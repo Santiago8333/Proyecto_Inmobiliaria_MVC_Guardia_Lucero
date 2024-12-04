@@ -7,5 +7,6 @@ public class InquilinosViewModel
 {
     public Paginacion<Inquilinos>? InquilinosPaginados { get; set; }
     public IEnumerable<Inquilinos>? Inquilinos { get; set; }
-
+    public string EstadoFiltro { get; set; } = "";
+    public string EmailInquilinosFiltro { get; set; } = "";
 }

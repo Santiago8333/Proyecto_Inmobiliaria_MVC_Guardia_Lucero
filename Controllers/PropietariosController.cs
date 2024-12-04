@@ -28,10 +28,20 @@ public class PropietariosController : Controller
     }
 */
 
-public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,string EmailPropietario = "Todos")
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,string EmailPropietario = "Todos",string estadoFiltro = "Todos")
 {
     var propietariosQueryable = repo.ObtenerTodos().AsQueryable();
     var listaPropietarios = propietariosQueryable;
+    //filtrar por Estado
+    if (estadoFiltro == "Activos")
+    {
+        propietariosQueryable = propietariosQueryable.Where(i => i.Estado == true);
+    }
+    else if (estadoFiltro == "Suspendidos")
+    {
+        propietariosQueryable = propietariosQueryable.Where(i => i.Estado == false);
+    }
+
     //aplicar filtro por email
     if (EmailPropietario != "Todos")
     {
@@ -45,7 +55,9 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,stri
     var viewModel = new PropietariosViewModel
     {
         PropietariosPaginados = paginacion,
-        Propietarios = listaPropietarios
+        Propietarios = listaPropietarios,
+        EstadoFiltro = estadoFiltro,
+        EmailPropietarioFiltro = EmailPropietario
     };
 
     return View(viewModel);
@@ -56,7 +68,7 @@ public IActionResult Agregar(Propietario nuevoPropietario)
     if (ModelState.IsValid)
     {
         var Propietarios = repo.ObtenerPorEmail(nuevoPropietario.Email);
-    if (Propietarios != null)
+        if (Propietarios != null)
         {
             TempData["Mensaje"] = "Este Propietario ya esta registrado.";
             return RedirectToAction("Index");

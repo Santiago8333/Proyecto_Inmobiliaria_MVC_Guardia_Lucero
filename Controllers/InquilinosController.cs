@@ -21,10 +21,20 @@ public IActionResult Index()
         return View(lista);
 }
 */
-public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,string EmailInquilinos = "Todos")
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,string EmailInquilinos = "Todos",string estadoFiltro = "Todos")
 {
     var inquilinosQueryable = repo.ObtenerTodos().AsQueryable();
     var listaInquilinos = inquilinosQueryable;
+    //filtrar por Estado
+    if (estadoFiltro == "Activos")
+    {
+        inquilinosQueryable = inquilinosQueryable.Where(i => i.Estado == true);
+    }
+    else if (estadoFiltro == "Suspendidos")
+    {
+        inquilinosQueryable = inquilinosQueryable.Where(i => i.Estado == false);
+    }
+
     //aplicar filtro por email
     if (EmailInquilinos != "Todos")
     {
@@ -37,7 +47,9 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5,stri
     var viewModel = new InquilinosViewModel
     {
         InquilinosPaginados = paginacion,
-        Inquilinos = listaInquilinos
+        Inquilinos = listaInquilinos,
+        EstadoFiltro = estadoFiltro,
+        EmailInquilinosFiltro = EmailInquilinos
     };
 
     return View(viewModel);
@@ -47,11 +59,17 @@ public IActionResult Agregar(Inquilinos nuevoInquilino)
 {
 if (ModelState.IsValid)
     {
+        var Inquilino = repo.ObtenerPorEmail(nuevoInquilino.Email);
+        if (Inquilino != null)
+        {
+            TempData["Mensaje"] = "Este Inquilino ya esta registrado.";
+            return RedirectToAction("Index");
+        }
          repo.AgregarPropietario(nuevoInquilino);
          TempData["Mensaje"] = "Inquilino agregado exitosamente.";
          return RedirectToAction("Index");
     }
-    var lista = repo.ObtenerTodos();
+    //var lista = repo.ObtenerTodos();
     TempData["Mensaje"] = "Hubo un error al agregar el Inquilino.";
     //return View("Index", lista);
     return RedirectToAction("Index");
@@ -119,5 +137,17 @@ if (ModelState.IsValid)
     }
 TempData["Mensaje"] = "error al actualizar Inquilino.";
 return RedirectToAction("Index");
+}
+public IActionResult Activar(int id)
+{
+    var Inquilino = repo.ObtenerPorID2(id);
+    if (Inquilino == null)
+        {
+            TempData["Mensaje"] = "Inquilino no encontrado.";
+            return RedirectToAction("Index");
+        }
+        repo.ActivarInquilino(id);
+        TempData["Mensaje"] = "Inquilino Activado.";
+        return RedirectToAction("Index");
 }
 }
