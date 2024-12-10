@@ -84,6 +84,7 @@ public IActionResult Agregar(Propietario nuevoPropietario)
     //return View("Index", lista);
 }
 
+[Authorize(Policy = "Administrador")]
 public IActionResult Eliminar(int id)
 {
   var propietario = repo.ObtenerPorID(id);
@@ -150,6 +151,7 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "Hubo un error al Modificar el Propietario.";
 return RedirectToAction("Index");
 }
+[Authorize(Policy = "Administrador")]
 public IActionResult Activar(int id)
 {
     var Propietario = repo.ObtenerPorID2(id);

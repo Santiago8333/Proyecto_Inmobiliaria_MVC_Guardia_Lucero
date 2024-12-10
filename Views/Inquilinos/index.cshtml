@@ -95,12 +95,14 @@
                     <a href="@Url.Action("Edicion", "Inquilinos", new { id = item.Id_inquilinos }) " class="btn btn-primary">
                       <i class="fa-solid fa-pencil"></i>
                   </a>
+                  @if(User.IsInRole("Administrador")){
                     <a href="javascript:void(0);" 
                       data-id="@item.Id_inquilinos" 
                       class="btn btn-danger" 
                       onclick="confirmDelete(this)">
                         <i class="fa-solid fa-trash"></i>
                   </a>
+                  }
 				</td>
 			</tr>
       }
@@ -126,12 +128,14 @@
 					@Html.DisplayFor(modelItem => item.Telefono)
 				</td>
         <td>
+            @if(User.IsInRole("Administrador")){
                   <a href="javascript:void(0);" 
                    data-id="@item.Id_inquilinos" 
                    class="btn btn-success"
                    onclick="confirmActivar(this)">
                    <i class="fa-solid fa-sync"></i> Reactivar
                 </a>
+                }
 				</td>
 			</tr>
       }

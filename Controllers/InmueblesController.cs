@@ -95,6 +95,8 @@ if (ModelState.IsValid)
     TempData["Mensaje"] = "Hubo un error al agregar el Inmueble.";
     return RedirectToAction("Index");
 }
+
+[Authorize(Policy = "Administrador")]
 public IActionResult Suspender(int id)
 {
     var Inmuebles = repo.ObtenerPorID(id);
@@ -107,6 +109,8 @@ public IActionResult Suspender(int id)
         TempData["Mensaje"] = "Inmueble Suspendido.";
         return RedirectToAction("Index");
 }
+
+[Authorize(Policy = "Administrador")]
 public IActionResult Activar(int id)
 {
     var Inmuebles = repo.ObtenerPorID2(id);

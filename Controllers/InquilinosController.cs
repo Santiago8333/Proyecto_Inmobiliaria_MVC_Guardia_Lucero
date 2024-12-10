@@ -76,6 +76,7 @@ if (ModelState.IsValid)
 
 }
 
+[Authorize(Policy = "Administrador")]
 public IActionResult Eliminar(int id)
 {
     var inquilinos = repo.ObtenerPorID(id);
@@ -138,6 +139,8 @@ if (ModelState.IsValid)
 TempData["Mensaje"] = "error al actualizar Inquilino.";
 return RedirectToAction("Index");
 }
+
+[Authorize(Policy = "Administrador")]
 public IActionResult Activar(int id)
 {
     var Inquilino = repo.ObtenerPorID2(id);

@@ -112,12 +112,14 @@
                 <a href="@Url.Action("Edicion", "Inmuebles", new { id = item.Id_inmueble }) " class="btn btn-primary">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
+                @if(User.IsInRole("Administrador")){
                 <a href="javascript:void(0);" 
                    data-id="@item.Id_inmueble" 
                    class="btn btn-warning" 
                    onclick="confirmSuspender(this)">
                     <i class="fa-solid fa-delete-left"></i>
                 </a>
+                }
             </td>
         </tr>
         }
@@ -146,12 +148,14 @@
                 Suspendida
             </td>
             <td>
+                @if(User.IsInRole("Administrador")){
                 <a href="javascript:void(0);" 
                    data-id="@item.Id_inmueble" 
                    class="btn btn-success"
                    onclick="confirmActivar(this)">
                    <i class="fa-solid fa-sync"></i> Reactivar
                 </a>
+                }
             </td>
         </tr>
         }
@@ -175,8 +179,8 @@
         <form asp-action="Agregar" method="post" id="formAgregarInmueble">
                     <div class="mb-3">
                 <label for="exampleInputPropietario" class="form-label">Email del Propietario</label>
-                <input list="propietariosList" type="text" class="form-control" id="exampleInputPropietario" name="Propietario">
-                <datalist id="propietariosList">
+                <input list="propietariosList2" type="text" class="form-control" id="exampleInputPropietario" name="Propietario">
+                <datalist id="propietariosList2">
                     @if (Model.InmueblesPaginados != null && Model.Propietarios != null)
                     {
                     @foreach (var propietario in Model.Propietarios)
@@ -365,13 +369,15 @@
     //busqueda de propietarios
  document.getElementById('exampleInputPropietario').addEventListener('input', function() {
         var input = this;
-        var list = document.getElementById('propietariosList');
+        var list = document.getElementById('propietariosList2');
         var hiddenInput = document.getElementById('Id_propietario');
         var options = list.options;
 
         hiddenInput.value = '';
-
+        console.log(input);
+        console.log(options[0].getAttribute('data-id'));
         for (var i = 0; i < options.length; i++) {
+            console.log(options[i].value);
             if (options[i].value === input.value) {
                 hiddenInput.value = options[i].getAttribute('data-id');
                 break;
